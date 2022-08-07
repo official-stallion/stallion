@@ -9,8 +9,10 @@ type broker struct {
 }
 
 // NewBroker generates a broker.
-func NewBroker() *broker {
-	return &broker{}
+func NewBroker(channel chan []byte) *broker {
+	return &broker{
+		receiveChannel: channel,
+	}
 }
 
 // Start will start our broker logic.
