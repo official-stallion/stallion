@@ -1,2 +1,3 @@
-# pony-express
-Message broker with Golang
+# Pony Express
+
+Message broker with Golang.
