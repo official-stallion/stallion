@@ -1,41 +1,33 @@
 package internal
 
-import (
-	"fmt"
-	"net"
-)
+import "net"
 
-type server struct{}
+// server is our broker service.
+type server struct {
+	index         int
+	publicChannel chan []byte
 
-func NewServer() *server {
-	return &server{}
+	broker *broker
 }
 
-func (s *server) start(port string) error {
-	listener, err := net.Listen("tcp", port)
-	if err != nil {
-		return fmt.Errorf("failed to start server: %v", err)
-	}
+// NewServer returns a new broker server.
+func NewServer() *server {
+	s := &server{}
 
-	var (
-		publicChannel chan []byte
-		index         = 0
-	)
+	s.broker = newBroker(s.publicChannel)
+	go s.broker.start()
 
-	defer close(publicChannel)
+	return s
+}
 
-	broker := newBroker(publicChannel)
-	go broker.start()
+// Handle will handle the clients.
+func (s *server) Handle(conn net.Conn) {
+	var temp chan []byte
 
-	for {
-		conn, _ := listener.Accept()
+	w := newWorker(s.index, conn, s.publicChannel, temp)
 
-		var temp chan []byte
+	s.index++
+	s.broker.subscribe(temp)
 
-		w := newWorker(index, conn, publicChannel, temp)
-
-		broker.subscribe(temp)
-
-		go w.start()
-	}
+	go w.start()
 }
