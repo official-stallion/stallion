@@ -8,8 +8,8 @@ import (
 // worker handles a single client that wants
 // to either subscribe or publish.
 type worker struct {
-	id   int
-	http http
+	id      int
+	handler handler
 
 	sendChannel    chan []byte
 	receiveChannel chan []byte
@@ -23,7 +23,7 @@ type worker struct {
 func NewWorker(id int, conn net.Conn, sen, rec chan []byte) *worker {
 	return &worker{
 		id: id,
-		http: http{
+		handler: handler{
 			conn: conn,
 		},
 		receiveChannel: rec,
@@ -47,14 +47,14 @@ func (w *worker) Start() {
 }
 
 func (w *worker) send(data []byte) {
-	if err := w.http.Write(data); err != nil {
+	if err := w.handler.Write(data); err != nil {
 		log.Fatalf("[%d] failed to send: %v\n", w.id, err)
 	}
 }
 
 func (w *worker) receive() {
 	for {
-		data, err := w.http.Read()
+		data, err := w.handler.Read()
 		if err == nil {
 			w.receiveChannel <- data
 		}

@@ -6,11 +6,13 @@ import (
 	"net"
 )
 
-type http struct {
+// handler handles a client for communication.
+type handler struct {
 	conn net.Conn
 }
 
-func (h *http) Write(data []byte) error {
+// Write will write a data into client socket.
+func (h *handler) Write(data []byte) error {
 	writer := bufio.NewWriter(h.conn)
 
 	if _, err := writer.Write(data); err != nil {
@@ -20,7 +22,8 @@ func (h *http) Write(data []byte) error {
 	return nil
 }
 
-func (h *http) Read() ([]byte, error) {
+// Read will read a data from client socket.
+func (h *handler) Read() ([]byte, error) {
 	var buffer []byte
 
 	reader := bufio.NewReader(h.conn)
