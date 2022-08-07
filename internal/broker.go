@@ -2,24 +2,32 @@ package internal
 
 type arrChan []chan []byte
 
+// broker handles the message sending and receiving.
 type broker struct {
-	channels map[string]arrChan
+	channels       arrChan
+	receiveChannel chan []byte
 }
 
+// NewBroker generates a broker.
 func NewBroker() *broker {
-	return &broker{
-		channels: make(map[string]arrChan),
+	return &broker{}
+}
+
+// Start will start our broker logic.
+func (b *broker) Start() {
+	select {
+	case data := <-b.receiveChannel:
+		b.send(data)
 	}
 }
 
-func (b *broker) send(data []byte, topic string) {
-	for _, channel := range b.channels[topic] {
+// Add will add subscribers to our broker.
+func (b *broker) Add(channel chan []byte) {
+	b.channels = append(b.channels, channel)
+}
+
+func (b *broker) send(data []byte) {
+	for _, channel := range b.channels {
 		channel <- data
-	}
-}
-
-func (b *broker) add(channel chan []byte, topic string) {
-	if _, ok := b.channels[topic]; ok {
-		b.channels[topic] = append(b.channels[topic], channel)
 	}
 }
