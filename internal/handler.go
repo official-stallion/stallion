@@ -11,8 +11,8 @@ type handler struct {
 	conn net.Conn
 }
 
-// Write will write a data into client socket.
-func (h *handler) Write(data []byte) error {
+// write will write a data into client socket.
+func (h *handler) write(data []byte) error {
 	writer := bufio.NewWriter(h.conn)
 
 	if _, err := writer.Write(data); err != nil {
@@ -22,8 +22,8 @@ func (h *handler) Write(data []byte) error {
 	return nil
 }
 
-// Read will read a data from client socket.
-func (h *handler) Read() ([]byte, error) {
+// read will read a data from client socket.
+func (h *handler) read() ([]byte, error) {
 	var buffer []byte
 
 	reader := bufio.NewReader(h.conn)

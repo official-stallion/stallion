@@ -11,30 +11,32 @@ type worker struct {
 	id      int
 	handler handler
 
-	sendChannel    chan []byte
+	// send channel is used for getting data from broker (its private between broker and worker)
+	sendChannel chan []byte
+	// receive channel is used for sending data to broker (its public)
 	receiveChannel chan []byte
 }
 
-// NewWorker generates a new worker.
+// newWorker generates a new worker.
 // id: for worker id.
 // conn: http connection over TCP.
 // sen: sending channel.
 // rec: receive channel.
-func NewWorker(id int, conn net.Conn, sen, rec chan []byte) *worker {
+func newWorker(id int, conn net.Conn, sen, rec chan []byte) *worker {
 	return &worker{
 		id: id,
 		handler: handler{
 			conn: conn,
 		},
-		receiveChannel: rec,
 		sendChannel:    sen,
+		receiveChannel: rec,
 	}
 }
 
 // Start will start our worker.
-func (w *worker) Start() {
+func (w *worker) start() {
 	// close send connection
-	defer close(w.sendChannel)
+	defer close(w.receiveChannel)
 
 	// start for input data
 	go w.receive()
@@ -46,15 +48,17 @@ func (w *worker) Start() {
 	}
 }
 
+// send will send a data byte through handler.
 func (w *worker) send(data []byte) {
-	if err := w.handler.Write(data); err != nil {
+	if err := w.handler.write(data); err != nil {
 		log.Fatalf("[%d] failed to send: %v\n", w.id, err)
 	}
 }
 
+// receive will check for input data from client.
 func (w *worker) receive() {
 	for {
-		data, err := w.handler.Read()
+		data, err := w.handler.read()
 		if err == nil {
 			w.receiveChannel <- data
 		}
