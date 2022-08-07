@@ -1,36 +1,49 @@
 package internal
 
-import "net"
+import (
+	"log"
+	"net"
+)
 
 type worker struct {
-	channel chan []byte
-	http    http
+	sendChannel    chan []byte
+	receiveChannel chan []byte
+
+	http http
+	id   int
 }
 
-func NewWorker(conn net.Conn) *worker {
+func NewWorker(id int, conn net.Conn) *worker {
 	return &worker{
 		http: http{
 			conn: conn,
 		},
+		id: id,
 	}
 }
 
-func (w *worker) start() {
+func (w *worker) Start() {
+	defer close(w.sendChannel)
+
+	go w.receive()
+
 	select {
-	case data := <-w.channel:
+	case data := <-w.sendChannel:
 		w.send(data)
 	}
 }
 
-func (w *worker) send(data []byte) error {
-	return w.http.Write(data)
+func (w *worker) send(data []byte) {
+	if err := w.http.Write(data); err != nil {
+		log.Fatalf("[%d] failed to send: %v\n", w.id, err)
+	}
 }
 
-func (w *worker) receive() []byte {
-	data, err := w.http.Read()
-	if err != nil {
-		return nil
+func (w *worker) receive() {
+	for {
+		data, err := w.http.Read()
+		if err == nil {
+			w.receiveChannel <- data
+		}
 	}
-
-	return data
 }
