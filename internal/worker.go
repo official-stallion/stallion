@@ -1,11 +1,18 @@
 package internal
 
+import "net"
+
 type worker struct {
 	channel chan []byte
+	http    http
 }
 
-func NewWorker() *worker {
-	return &worker{}
+func NewWorker(conn net.Conn) *worker {
+	return &worker{
+		http: http{
+			conn: conn,
+		},
+	}
 }
 
 func (w *worker) start() {
@@ -15,10 +22,15 @@ func (w *worker) start() {
 	}
 }
 
-func (w *worker) send(data []byte) {
-
+func (w *worker) send(data []byte) error {
+	return w.http.Write(data)
 }
 
-func (w *worker) receive(data []byte) {
+func (w *worker) receive() []byte {
+	data, err := w.http.Read()
+	if err != nil {
+		return nil
+	}
 
+	return data
 }
