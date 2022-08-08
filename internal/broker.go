@@ -28,14 +28,10 @@ func (b *broker) start() {
 // subscribe will add subscribers to our broker.
 func (b *broker) subscribe(channel chan []byte) {
 	b.channels = append(b.channels, channel)
-
-	log.Printf("subscribers %d\n", len(b.channels))
 }
 
 // publish will send a data over channels
 func (b *broker) publish(data []byte) {
-	log.Printf("broker publish: %s\n", string(data))
-
 	for _, channel := range b.channels {
 		channel <- data
 	}

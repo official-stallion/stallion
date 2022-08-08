@@ -9,7 +9,9 @@ import (
 )
 
 func NewServer(port string) error {
-	serve := internal.NewServer()
+	channel := make(chan []byte)
+
+	serve := internal.NewServer(channel)
 
 	listener, err := net.Listen("tcp", port)
 	if err != nil {
@@ -20,6 +22,6 @@ func NewServer(port string) error {
 
 	for {
 		conn, _ := listener.Accept()
-		serve.Handle(conn)
+		serve.Handle(conn, channel)
 	}
 }

@@ -7,29 +7,27 @@ import (
 
 // server is our broker service.
 type server struct {
-	index         int
-	publicChannel chan []byte
-
+	index  int
 	broker *broker
 }
 
 // NewServer returns a new broker server.
-func NewServer() *server {
+func NewServer(publicChannel chan []byte) *server {
 	s := &server{
 		index: 101,
 	}
 
-	s.broker = newBroker(s.publicChannel)
+	s.broker = newBroker(publicChannel)
 	go s.broker.start()
 
 	return s
 }
 
 // Handle will handle the clients.
-func (s *server) Handle(conn net.Conn) {
-	var temp chan []byte
+func (s *server) Handle(conn net.Conn, publicChannel chan []byte) {
+	temp := make(chan []byte)
 
-	w := newWorker(s.index, conn, temp, s.publicChannel)
+	w := newWorker(s.index, conn, temp, publicChannel)
 
 	log.Printf("new worker %d\n", s.index)
 
