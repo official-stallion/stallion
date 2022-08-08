@@ -13,10 +13,7 @@ func main() {
 	}
 
 	client.Subscribe()
+	client.Publish([]byte("Hello world"))
 
-	_ = client.Publish([]byte("Hello world 1"))
-	_ = client.Publish([]byte("Hello world 2"))
-	_ = client.Publish([]byte("Hello world 3"))
-
-	time.Sleep(5 * time.Second)
+	time.Sleep(3 * time.Second)
 }

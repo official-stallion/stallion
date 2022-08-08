@@ -38,6 +38,9 @@ func newWorker(id int, conn net.Conn, sen, rec chan []byte) *worker {
 
 // Start will start our worker.
 func (w *worker) start() {
+	// close channel
+	defer close(w.sendChannel)
+
 	// start for input data
 	go w.receive()
 
