@@ -29,7 +29,7 @@ func (c *client) Subscribe() {
 	go func() {
 		for {
 			data, err := c.handler.read()
-			if err == nil {
+			if err == nil && len(data) > 0 {
 				fmt.Println(data)
 			}
 		}
