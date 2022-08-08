@@ -1,37 +1,51 @@
 package internal
 
 import (
+	"bufio"
 	"fmt"
+	"io"
+	"log"
 	"net"
+	"time"
 )
 
 type client struct {
-	handler handler
+	connection net.Conn
 }
 
 func NewClient(conn net.Conn) *client {
 	return &client{
-		handler: handler{
-			conn: conn,
-		},
+		connection: conn,
 	}
 }
 
 func (c *client) Publish(data []byte) error {
-	if err := c.handler.write(data); err != nil {
+	writer := bufio.NewWriter(c.connection)
+	if _, err := writer.Write(data); err != nil {
 		return fmt.Errorf("failed to send: %v\n", err)
 	}
+
+	_ = writer.Flush()
+	time.Sleep(10 * time.Millisecond)
+
+	fmt.Printf("send %d bytes\n", len(data))
 
 	return nil
 }
 
 func (c *client) Subscribe() {
 	go func() {
+		tmp := make([]byte, 1024)
 		for {
-			data, err := c.handler.read()
-			if err == nil && len(data) > 0 {
-				fmt.Println(data)
+			n, err := c.connection.Read(tmp)
+			if err != nil {
+				if err != io.EOF {
+					fmt.Printf("read error: %s\n", err)
+				}
+				break
 			}
+
+			log.Printf("got %d bytes\n", n)
 		}
 	}()
 }

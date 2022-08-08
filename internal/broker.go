@@ -1,5 +1,7 @@
 package internal
 
+import "log"
+
 // broker handles the message sending and receiving.
 type broker struct {
 	channels       []chan []byte
@@ -15,6 +17,8 @@ func newBroker(channel chan []byte) *broker {
 
 // start will start our broker logic.
 func (b *broker) start() {
+	log.Printf("broker start ...\n")
+
 	select {
 	case data := <-b.receiveChannel:
 		b.publish(data)
@@ -24,10 +28,14 @@ func (b *broker) start() {
 // subscribe will add subscribers to our broker.
 func (b *broker) subscribe(channel chan []byte) {
 	b.channels = append(b.channels, channel)
+
+	log.Printf("subscribers %d\n", len(b.channels))
 }
 
 // publish will send a data over channels
 func (b *broker) publish(data []byte) {
+	log.Printf("broker publish: %s\n", string(data))
+
 	for _, channel := range b.channels {
 		channel <- data
 	}

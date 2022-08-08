@@ -1,6 +1,9 @@
 package internal
 
-import "net"
+import (
+	"log"
+	"net"
+)
 
 // server is our broker service.
 type server struct {
@@ -12,7 +15,9 @@ type server struct {
 
 // NewServer returns a new broker server.
 func NewServer() *server {
-	s := &server{}
+	s := &server{
+		index: 101,
+	}
 
 	s.broker = newBroker(s.publicChannel)
 	go s.broker.start()
@@ -24,7 +29,9 @@ func NewServer() *server {
 func (s *server) Handle(conn net.Conn) {
 	var temp chan []byte
 
-	w := newWorker(s.index, conn, s.publicChannel, temp)
+	w := newWorker(s.index, conn, temp, s.publicChannel)
+
+	log.Printf("new worker %d\n", s.index)
 
 	s.index++
 	s.broker.subscribe(temp)
