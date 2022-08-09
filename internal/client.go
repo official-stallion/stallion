@@ -1,34 +1,31 @@
 package internal
 
 import (
-	"bufio"
-	"fmt"
-	"io"
-	"log"
 	"net"
 	"time"
 )
 
 // client is our user application handler.
 type client struct {
-	connection net.Conn
+	network network
 }
 
 // NewClient creates a new client handler.
 func NewClient(conn net.Conn) *client {
 	return &client{
-		connection: conn,
+		network: network{
+			connection: conn,
+		},
 	}
 }
 
 // Publish will send a message to broker server.
 func (c *client) Publish(data []byte) error {
-	writer := bufio.NewWriter(c.connection)
-	if _, err := writer.Write(data); err != nil {
-		return fmt.Errorf("failed to send: %v\n", err)
+	err := c.network.send(data)
+	if err != nil {
+		return err
 	}
 
-	_ = writer.Flush()
 	time.Sleep(10 * time.Millisecond)
 
 	return nil
@@ -36,18 +33,18 @@ func (c *client) Publish(data []byte) error {
 
 func (c *client) Subscribe(handler MessageHandler) {
 	go func() {
-		tmp := make([]byte, 1024)
-		for {
-			n, err := c.connection.Read(tmp)
-			if err != nil {
-				if err != io.EOF {
-					log.Printf("read error: %s\n", err)
-				}
+		var (
+			err    error
+			buffer = make([]byte, 1024)
+		)
 
+		for {
+			buffer, err = c.network.get(buffer)
+			if err != nil {
 				break
 			}
 
-			handler(tmp[:n])
+			handler(buffer)
 		}
 	}()
 }
