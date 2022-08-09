@@ -6,3 +6,7 @@ const (
 	Subscribe
 	Unsubscribe
 )
+
+const (
+	DummyMessage = "hello world"
+)

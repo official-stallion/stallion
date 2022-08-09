@@ -15,7 +15,7 @@ func main() {
 		fmt.Println(string(data))
 	})
 
-	client.Publish([]byte("Hello world"))
+	client.Publish([]byte("Hello"))
 
 	select {}
 }

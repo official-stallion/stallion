@@ -47,7 +47,7 @@ func (c *client) readDataFromServer() {
 
 		switch m.Type {
 		case Message:
-			c.communicateChannel <- []byte(m.Data)
+			c.communicateChannel <- m.Data
 		}
 	}
 }
@@ -66,11 +66,10 @@ func (c *client) Publish(data []byte) error {
 
 // Subscribe subscribes over broker.
 func (c *client) Subscribe(handler MessageHandler) {
+	_ = c.network.send(encodeMessage(newMessage(Subscribe, []byte(DummyMessage))))
+	time.Sleep(10 * time.Millisecond)
+
 	go func() {
-		_ = c.network.send(encodeMessage(newMessage(Subscribe, nil)))
-
-		time.Sleep(10 * time.Millisecond)
-
 		for {
 			select {
 			case data := <-c.communicateChannel:

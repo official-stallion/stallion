@@ -85,7 +85,7 @@ func (w *worker) arrival() {
 		switch m.Type {
 		case Message:
 			// passing data to broker channel
-			w.receiveChannel <- []byte(m.Data)
+			w.receiveChannel <- m.Data
 		case Subscribe:
 			// passing subscribe message
 			w.statusChannel <- WorkChan{

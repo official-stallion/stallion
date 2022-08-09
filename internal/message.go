@@ -1,18 +1,20 @@
 package internal
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 // Message is what we send between worker and clients.
 type message struct {
 	Type int    `json:"type"`
-	Data string `json:"message"`
+	Data []byte `json:"data"`
 }
 
 // NewMessage generates a new message type.
 func newMessage(t int, data []byte) message {
 	return message{
 		Type: t,
-		Data: string(data),
+		Data: data,
 	}
 }
 
