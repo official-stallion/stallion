@@ -52,7 +52,7 @@ func (w *worker) start() {
 	}
 }
 
-// send will send a data byte through handler.
+// transfer will send a data byte through handler.
 func (w *worker) transfer(data []byte) {
 	err := w.network.send(data)
 	if err != nil {
@@ -62,7 +62,7 @@ func (w *worker) transfer(data []byte) {
 	time.Sleep(10 * time.Millisecond)
 }
 
-// receive will check for input data from client.
+// arrival will check for input data from client.
 func (w *worker) arrival() {
 	var (
 		err    error

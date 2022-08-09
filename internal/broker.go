@@ -27,7 +27,7 @@ func newBroker(receive chan []byte, status chan int) *broker {
 func (b *broker) start() {
 	log.Printf("broker server start ...\n")
 
-	go b.unsubscribe()
+	go b.removeDeadWorker()
 
 	for {
 		select {
@@ -48,8 +48,8 @@ func (b *broker) subscribe(channel chan []byte, id int) {
 	)
 }
 
-// unsubscribe will remove a channel from broker list.
-func (b *broker) unsubscribe() {
+// removeDeadWorker will remove a channel from broker list.
+func (b *broker) removeDeadWorker() {
 	for {
 		select {
 		case id := <-b.statusChannel:
