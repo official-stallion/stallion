@@ -10,8 +10,6 @@ type client struct {
 	// communication channel allows a client to make
 	// a connection channel between read data and subscribers
 	communicateChannel chan []byte
-	// temporary boolean for subscribe
-	subscribe bool
 
 	network network
 }
@@ -20,7 +18,6 @@ type client struct {
 func NewClient(conn net.Conn) *client {
 	c := &client{
 		communicateChannel: make(chan []byte),
-		subscribe:          false,
 
 		network: network{
 			connection: conn,
@@ -47,11 +44,10 @@ func (c *client) readDataFromServer() {
 		}
 
 		m, _ := decodeMessage(buffer)
+
 		switch m.Type {
 		case Message:
-			if c.subscribe {
-				c.communicateChannel <- m.Data
-			}
+			c.communicateChannel <- m.Data
 		}
 	}
 }
@@ -71,7 +67,9 @@ func (c *client) Publish(data []byte) error {
 // Subscribe subscribes over broker.
 func (c *client) Subscribe(handler MessageHandler) {
 	go func() {
-		c.subscribe = true
+		_ = c.network.send(encodeMessage(newMessage(Subscribe, nil)))
+
+		time.Sleep(10 * time.Millisecond)
 
 		for {
 			select {

@@ -68,6 +68,7 @@ func (w *worker) arrival() {
 		err    error
 		buffer = make([]byte, 1024)
 	)
+
 	for {
 		buffer, err = w.network.get(buffer)
 		if err != nil {
@@ -80,6 +81,19 @@ func (w *worker) arrival() {
 		case Message:
 			// passing data to broker channel
 			w.receiveChannel <- m.Data
+		case Subscribe:
+			// passing subscribe message
+			w.statusChannel <- WorkChan{
+				id:      w.id,
+				status:  true,
+				channel: w.sendChannel,
+			}
+		case Unsubscribe:
+			// passing unsubscribe message
+			w.statusChannel <- WorkChan{
+				id:     w.id,
+				status: false,
+			}
 		}
 	}
 

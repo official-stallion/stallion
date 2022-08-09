@@ -28,7 +28,6 @@ func (s *server) Handle(conn net.Conn, public chan []byte, status chan WorkChan)
 	w := newWorker(s.prefix, conn, make(chan []byte), public, status)
 
 	s.prefix++
-	s.broker.subscribe(w.sendChannel, w.id)
 
 	go w.start()
 }
