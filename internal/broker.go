@@ -1,6 +1,8 @@
 package internal
 
-import "log"
+import (
+	"log"
+)
 
 // broker handles the message sending and receiving.
 type broker struct {
@@ -19,9 +21,11 @@ func newBroker(channel chan []byte) *broker {
 func (b *broker) start() {
 	log.Printf("broker start ...\n")
 
-	select {
-	case data := <-b.receiveChannel:
-		b.publish(data)
+	for {
+		select {
+		case data := <-b.receiveChannel:
+			b.publish(data)
+		}
 	}
 }
 

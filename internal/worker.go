@@ -38,16 +38,15 @@ func newWorker(id int, conn net.Conn, sen, rec chan []byte) *worker {
 
 // Start will start our worker.
 func (w *worker) start() {
-	// close channel
-	defer close(w.sendChannel)
-
 	// start for input data
 	go w.receive()
 
 	// wait for any interrupt in send channel
-	select {
-	case data := <-w.sendChannel:
-		w.send(data)
+	for {
+		select {
+		case data := <-w.sendChannel:
+			w.send(data)
+		}
 	}
 }
 
@@ -73,6 +72,7 @@ func (w *worker) receive() {
 			if err != io.EOF {
 				fmt.Printf("read error: %s\n", err)
 			}
+
 			break
 		}
 

@@ -42,6 +42,7 @@ func (c *client) Subscribe() {
 				if err != io.EOF {
 					fmt.Printf("read error: %s\n", err)
 				}
+
 				break
 			}
 
