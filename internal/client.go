@@ -46,10 +46,12 @@ func (c *client) readDataFromServer() {
 			break
 		}
 
-		if c.subscribe {
-			m, _ := decodeMessage(buffer)
-
-			c.communicateChannel <- m.Data
+		m, _ := decodeMessage(buffer)
+		switch m.Type {
+		case Message:
+			if c.subscribe {
+				c.communicateChannel <- m.Data
+			}
 		}
 	}
 }

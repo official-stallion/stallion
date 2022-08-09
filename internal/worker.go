@@ -76,8 +76,11 @@ func (w *worker) arrival() {
 
 		m, _ := decodeMessage(buffer)
 
-		// passing data to broker channel
-		w.receiveChannel <- m.Data
+		switch m.Type {
+		case Message:
+			// passing data to broker channel
+			w.receiveChannel <- m.Data
+		}
 	}
 
 	// announcing that the worker is done
