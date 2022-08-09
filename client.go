@@ -10,7 +10,7 @@ import (
 type Client interface {
 	Publish([]byte) error
 
-	Subscribe(func(data []byte))
+	Subscribe(handler internal.MessageHandler)
 }
 
 func NewClient(uri string) (Client, error) {

@@ -9,16 +9,19 @@ import (
 	"time"
 )
 
+// client is our user application handler.
 type client struct {
 	connection net.Conn
 }
 
+// NewClient creates a new client handler.
 func NewClient(conn net.Conn) *client {
 	return &client{
 		connection: conn,
 	}
 }
 
+// Publish will send a message to broker server.
 func (c *client) Publish(data []byte) error {
 	writer := bufio.NewWriter(c.connection)
 	if _, err := writer.Write(data); err != nil {
@@ -28,25 +31,21 @@ func (c *client) Publish(data []byte) error {
 	_ = writer.Flush()
 	time.Sleep(10 * time.Millisecond)
 
-	fmt.Printf("send %d bytes\n", len(data))
-
 	return nil
 }
 
-func (c *client) Subscribe(handler func(data []byte)) {
+func (c *client) Subscribe(handler MessageHandler) {
 	go func() {
 		tmp := make([]byte, 1024)
 		for {
 			n, err := c.connection.Read(tmp)
 			if err != nil {
 				if err != io.EOF {
-					fmt.Printf("read error: %s\n", err)
+					log.Printf("read error: %s\n", err)
 				}
 
 				break
 			}
-
-			log.Printf("got %d bytes\n", n)
 
 			handler(tmp[:n])
 		}
