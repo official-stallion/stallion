@@ -8,12 +8,16 @@ import (
 	"github.com/amirhnajafiz/pony-express/internal"
 )
 
+// NewServer creates a new broker server on given port.
 func NewServer(port string) error {
+	// channels for public and status messages
 	channel := make(chan []byte)
 	status := make(chan int)
 
+	// creating a new server
 	serve := internal.NewServer(channel, status)
 
+	// listen over a port
 	listener, err := net.Listen("tcp", port)
 	if err != nil {
 		return fmt.Errorf("failed to start server: %v", err)
@@ -21,8 +25,10 @@ func NewServer(port string) error {
 
 	log.Printf("start broker server on %s ...\n", port)
 
+	// handling our clients
 	for {
 		conn, _ := listener.Accept()
+
 		serve.Handle(conn, channel, status)
 	}
 }
