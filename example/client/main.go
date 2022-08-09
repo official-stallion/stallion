@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"time"
+
+	"github.com/amirhnajafiz/stallion"
 )
 
 func main() {

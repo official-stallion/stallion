@@ -1,4 +1,4 @@
-package pony_express
+package stallion
 
 import (
 	"fmt"
