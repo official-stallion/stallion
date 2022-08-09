@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	ponyExpress "github.com/amirhnajafiz/pony-express"
 )
 
@@ -10,7 +11,10 @@ func main() {
 		panic(err)
 	}
 
-	client.Subscribe()
+	client.Subscribe(func(data []byte) {
+		fmt.Println(string(data))
+	})
+
 	client.Publish([]byte("Hello world"))
 
 	select {}

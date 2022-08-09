@@ -33,7 +33,7 @@ func (c *client) Publish(data []byte) error {
 	return nil
 }
 
-func (c *client) Subscribe() {
+func (c *client) Subscribe(handler func(data []byte)) {
 	go func() {
 		tmp := make([]byte, 1024)
 		for {
@@ -47,6 +47,8 @@ func (c *client) Subscribe() {
 			}
 
 			log.Printf("got %d bytes\n", n)
+
+			handler(tmp[:n])
 		}
 	}()
 }
