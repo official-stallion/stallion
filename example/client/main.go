@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	ponyExpress "github.com/amirhnajafiz/pony-express"
+	"time"
 )
 
 func main() {
@@ -16,6 +17,10 @@ func main() {
 	})
 
 	client.Publish([]byte("Hello"))
+
+	time.Sleep(3 * time.Second)
+
+	client.Unsubscribe()
 
 	select {}
 }

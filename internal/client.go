@@ -73,19 +73,21 @@ func (c *client) Subscribe(handler MessageHandler) {
 	time.Sleep(10 * time.Millisecond)
 
 	go func() {
-		for {
+		flag := true
+
+		for flag {
 			select {
 			case data := <-c.communicateChannel:
 				handler(data)
 			case <-c.terminateChannel:
-				break
+				flag = false
 			}
 		}
 	}()
 }
 
 func (c *client) Unsubscribe() {
-	_ = c.network.send(encodeMessage(newMessage(Unsubscribe, []byte(DummyMessage))))
+	_ = c.network.send(encodeMessage(newMessage(Unsubscribe, nil)))
 	time.Sleep(10 * time.Millisecond)
 
 	c.terminateChannel <- 1
