@@ -47,7 +47,7 @@ func (c *client) readDataFromServer() {
 
 		switch m.Type {
 		case Message:
-			c.communicateChannel <- m.Data
+			c.communicateChannel <- []byte(m.Data)
 		}
 	}
 }

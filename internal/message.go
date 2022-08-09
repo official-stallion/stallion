@@ -5,14 +5,14 @@ import "encoding/json"
 // Message is what we send between worker and clients.
 type message struct {
 	Type int    `json:"type"`
-	Data []byte `json:"message"`
+	Data string `json:"message"`
 }
 
 // NewMessage generates a new message type.
 func newMessage(t int, data []byte) message {
 	return message{
 		Type: t,
-		Data: data,
+		Data: string(data),
 	}
 }
 

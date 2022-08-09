@@ -75,12 +75,17 @@ func (w *worker) arrival() {
 			break
 		}
 
-		m, _ := decodeMessage(buffer)
+		m, er := decodeMessage(buffer)
+		if er != nil {
+			log.Printf("json error: %v", er)
+
+			continue
+		}
 
 		switch m.Type {
 		case Message:
 			// passing data to broker channel
-			w.receiveChannel <- m.Data
+			w.receiveChannel <- []byte(m.Data)
 		case Subscribe:
 			// passing subscribe message
 			w.statusChannel <- WorkChan{
