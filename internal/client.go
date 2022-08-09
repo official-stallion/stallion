@@ -56,7 +56,7 @@ func (c *client) readDataFromServer() {
 
 // Publish will send a message to broker server.
 func (c *client) Publish(data []byte) error {
-	err := c.network.send(encodeMessage(newMessage(0, data)))
+	err := c.network.send(encodeMessage(newMessage(Message, data)))
 	if err != nil {
 		return err
 	}
