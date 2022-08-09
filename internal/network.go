@@ -8,10 +8,12 @@ import (
 	"net"
 )
 
+// network handles the tcp requests.
 type network struct {
 	connection net.Conn
 }
 
+// send data over tcp.
 func (n *network) send(data []byte) error {
 	writer := bufio.NewWriter(n.connection)
 	if _, err := writer.Write(data); err != nil {
@@ -23,6 +25,7 @@ func (n *network) send(data []byte) error {
 	return nil
 }
 
+// get data from tcp.
 func (n *network) get(buffer []byte) ([]byte, error) {
 	bytes, err := n.connection.Read(buffer)
 	if err != nil {
