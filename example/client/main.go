@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	ponyExpress "github.com/amirhnajafiz/pony-express"
 	"time"
 )
 
 func main() {
-	client, err := ponyExpress.NewClient("localhost:9090")
+	client, err := stallion.NewClient("localhost:9090")
 	if err != nil {
 		panic(err)
 	}

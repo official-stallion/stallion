@@ -1,3 +1,3 @@
-module github.com/amirhnajafiz/pony-express
+module github.com/amirhnajafiz/stallion
 
 go 1.18

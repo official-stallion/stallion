@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/amirhnajafiz/pony-express/internal"
+	"github.com/amirhnajafiz/stallion/internal"
 )
 
 // Client is our client handler which enables a user

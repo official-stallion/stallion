@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/amirhnajafiz/pony-express/internal"
+	"github.com/amirhnajafiz/stallion/internal"
 )
 
 // NewServer creates a new broker server on given port.
