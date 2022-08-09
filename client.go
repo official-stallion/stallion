@@ -14,6 +14,8 @@ type Client interface {
 	Publish([]byte) error
 	// Subscribe over broker
 	Subscribe(handler internal.MessageHandler)
+	// Unsubscribe from broker
+	Unsubscribe()
 }
 
 // NewClient creates a new client to connect to broker server.
