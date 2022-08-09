@@ -7,16 +7,27 @@ import (
 
 // client is our user application handler.
 type client struct {
+	communicateChannel chan []byte
+	subscribe          bool
+
 	network network
 }
 
 // NewClient creates a new client handler.
 func NewClient(conn net.Conn) *client {
-	return &client{
+	c := &client{
+		communicateChannel: make(chan []byte),
+		subscribe:          false,
+
 		network: network{
 			connection: conn,
 		},
 	}
+
+	// starting data reader
+	go c.readDataFromServer()
+
+	return c
 }
 
 // Publish will send a message to broker server.
@@ -31,20 +42,35 @@ func (c *client) Publish(data []byte) error {
 	return nil
 }
 
+// readDataFromServer gets all data from server.
+func (c *client) readDataFromServer() {
+	var (
+		err    error
+		buffer = make([]byte, 1024)
+	)
+
+	for {
+		buffer, err = c.network.get(buffer)
+		if err != nil {
+			break
+		}
+
+		if c.subscribe {
+			c.communicateChannel <- buffer
+		}
+	}
+}
+
+// Subscribe subscribes over broker.
 func (c *client) Subscribe(handler MessageHandler) {
 	go func() {
-		var (
-			err    error
-			buffer = make([]byte, 1024)
-		)
+		c.subscribe = true
 
 		for {
-			buffer, err = c.network.get(buffer)
-			if err != nil {
-				break
+			select {
+			case data := <-c.communicateChannel:
+				handler(data)
 			}
-
-			handler(buffer)
 		}
 	}()
 }
