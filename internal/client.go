@@ -7,8 +7,11 @@ import (
 
 // client is our user application handler.
 type client struct {
+	// communication channel allows a client to make
+	// a connection channel between read data and subscribers
 	communicateChannel chan []byte
-	subscribe          bool
+	// temporary boolean for subscribe
+	subscribe bool
 
 	network network
 }
@@ -30,18 +33,6 @@ func NewClient(conn net.Conn) *client {
 	return c
 }
 
-// Publish will send a message to broker server.
-func (c *client) Publish(data []byte) error {
-	err := c.network.send(data)
-	if err != nil {
-		return err
-	}
-
-	time.Sleep(10 * time.Millisecond)
-
-	return nil
-}
-
 // readDataFromServer gets all data from server.
 func (c *client) readDataFromServer() {
 	var (
@@ -59,6 +50,18 @@ func (c *client) readDataFromServer() {
 			c.communicateChannel <- buffer
 		}
 	}
+}
+
+// Publish will send a message to broker server.
+func (c *client) Publish(data []byte) error {
+	err := c.network.send(data)
+	if err != nil {
+		return err
+	}
+
+	time.Sleep(10 * time.Millisecond)
+
+	return nil
 }
 
 // Subscribe subscribes over broker.
