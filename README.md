@@ -1,3 +1,3 @@
-# Pony Express
+# Stallion
 
 Message broker with Golang.
