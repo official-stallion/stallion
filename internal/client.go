@@ -47,14 +47,16 @@ func (c *client) readDataFromServer() {
 		}
 
 		if c.subscribe {
-			c.communicateChannel <- buffer
+			m, _ := DecodeMessage(buffer)
+
+			c.communicateChannel <- m.Data
 		}
 	}
 }
 
 // Publish will send a message to broker server.
 func (c *client) Publish(data []byte) error {
-	err := c.network.send(data)
+	err := c.network.send(EncodeMessage(NewMessage(0, data)))
 	if err != nil {
 		return err
 	}
