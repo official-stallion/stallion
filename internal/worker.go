@@ -2,7 +2,6 @@ package internal
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"log"
 	"net"
@@ -28,14 +27,14 @@ type worker struct {
 // conn: http connection over TCP.
 // sen: sending channel.
 // rec: receive channel.
-func newWorker(id int, conn net.Conn, sen, rec chan []byte, status chan int) *worker {
+func newWorker(id int, conn net.Conn, sen, rec chan []byte, sts chan int) *worker {
 	return &worker{
 		id:         id,
 		connection: conn,
 
 		sendChannel:    sen,
 		receiveChannel: rec,
-		statusChannel:  status,
+		statusChannel:  sts,
 	}
 }
 
@@ -62,8 +61,6 @@ func (w *worker) send(data []byte) {
 
 	_ = writer.Flush()
 	time.Sleep(10 * time.Millisecond)
-
-	fmt.Printf("send %d bytes\n", len(data))
 }
 
 // receive will check for input data from client.
@@ -73,16 +70,16 @@ func (w *worker) receive() {
 		n, err := w.connection.Read(tmp)
 		if err != nil {
 			if err != io.EOF {
-				fmt.Printf("read error: %s\n", err)
+				log.Printf("read error: %s\n", err)
 			}
 
 			break
 		}
 
-		log.Printf("got %d bytes\n", n)
-
+		// passing data to broker channel
 		w.receiveChannel <- tmp[:n]
 	}
 
+	// announcing that the worker is done
 	w.statusChannel <- w.id
 }
