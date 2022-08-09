@@ -1,8 +1,6 @@
 package main
 
 import (
-	"time"
-
 	ponyExpress "github.com/amirhnajafiz/pony-express"
 )
 
@@ -15,5 +13,5 @@ func main() {
 	client.Subscribe()
 	client.Publish([]byte("Hello world"))
 
-	time.Sleep(3 * time.Second)
+	select {}
 }
