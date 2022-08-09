@@ -7,16 +7,16 @@ import (
 // broker handles the message sending and receiving.
 type broker struct {
 	// list of broker workers
-	workers []workChan
+	workers []WorkChan
 
 	// receiveChannel is a public channel between workers and broker
 	receiveChannel chan []byte
 	// with statusChannel broker manages the workers status
-	statusChannel chan int
+	statusChannel chan WorkChan
 }
 
 // newBroker generates a broker.
-func newBroker(receive chan []byte, status chan int) *broker {
+func newBroker(receive chan []byte, status chan WorkChan) *broker {
 	return &broker{
 		receiveChannel: receive,
 		statusChannel:  status,
@@ -27,7 +27,7 @@ func newBroker(receive chan []byte, status chan int) *broker {
 func (b *broker) start() {
 	log.Printf("broker server start ...\n")
 
-	go b.removeDeadWorker()
+	go b.listenToWorkers()
 
 	for {
 		select {
@@ -41,25 +41,34 @@ func (b *broker) start() {
 func (b *broker) subscribe(channel chan []byte, id int) {
 	b.workers = append(
 		b.workers,
-		workChan{
+		WorkChan{
 			id:      id,
 			channel: channel,
 		},
 	)
 }
 
-// removeDeadWorker will remove a channel from broker list.
-func (b *broker) removeDeadWorker() {
+// listenToWorkers will update workers based on status channel.
+func (b *broker) listenToWorkers() {
 	for {
 		select {
-		case id := <-b.statusChannel:
-			for index, value := range b.workers {
-				if value.id == id {
-					b.workers = append(b.workers[:index], b.workers[index+1:]...)
-
-					break
-				}
+		case worker := <-b.statusChannel:
+			if worker.status {
+				b.subscribe(worker.channel, worker.id)
+			} else {
+				b.removeDeadWorker(worker.id)
 			}
+		}
+	}
+}
+
+// removeDeadWorker will remove a channel from broker list.
+func (b *broker) removeDeadWorker(id int) {
+	for index, value := range b.workers {
+		if value.id == id {
+			b.workers = append(b.workers[:index], b.workers[index+1:]...)
+
+			break
 		}
 	}
 }
