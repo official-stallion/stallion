@@ -25,7 +25,7 @@ func newBroker(receive chan []byte, status chan int) *broker {
 
 // start will start our broker logic.
 func (b *broker) start() {
-	log.Printf("broker start ...\n")
+	log.Printf("broker server start ...\n")
 
 	go b.unsubscribe()
 
