@@ -5,8 +5,8 @@ type MessageHandler func([]byte)
 
 // Message is what we send between worker and clients.
 type Message struct {
-	Type    string `json:"type"`
-	Message string `json:"message"`
+	Type int    `json:"type"`
+	Data []byte `json:"message"`
 }
 
 // workChan is worker channel with its id.
