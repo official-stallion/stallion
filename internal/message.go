@@ -3,29 +3,29 @@ package internal
 import "encoding/json"
 
 // Message is what we send between worker and clients.
-type Message struct {
+type message struct {
 	Type int    `json:"type"`
 	Data []byte `json:"message"`
 }
 
 // NewMessage generates a new message type.
-func NewMessage(t int, data []byte) Message {
-	return Message{
+func newMessage(t int, data []byte) message {
+	return message{
 		Type: t,
 		Data: data,
 	}
 }
 
 // EncodeMessage will convert message to array of bytes.
-func EncodeMessage(m Message) []byte {
+func encodeMessage(m message) []byte {
 	bytes, _ := json.Marshal(m)
 
 	return bytes
 }
 
 // DecodeMessage will convert array of bytes to Message.
-func DecodeMessage(bytes []byte) (*Message, error) {
-	var m Message
+func decodeMessage(bytes []byte) (*message, error) {
+	var m message
 
 	if err := json.Unmarshal(bytes, &m); err != nil {
 		return nil, err
