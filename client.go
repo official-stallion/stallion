@@ -7,12 +7,16 @@ import (
 	"github.com/amirhnajafiz/pony-express/internal"
 )
 
+// Client is our client handler which enables a user
+// to communicate with broker server.
 type Client interface {
+	// Publish messages to broker
 	Publish([]byte) error
-
-	Subscribe(func(data []byte))
+	// Subscribe over broker
+	Subscribe(handler internal.MessageHandler)
 }
 
+// NewClient creates a new client to connect to broker server.
 func NewClient(uri string) (Client, error) {
 	conn, err := net.Dial("tcp", uri)
 	if err != nil {

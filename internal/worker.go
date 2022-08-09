@@ -1,9 +1,6 @@
 package internal
 
 import (
-	"bufio"
-	"fmt"
-	"io"
 	"log"
 	"net"
 	"time"
@@ -12,8 +9,8 @@ import (
 // worker handles a single client that wants
 // to either subscribe or publish.
 type worker struct {
-	id         int
-	connection net.Conn
+	id      int
+	network network
 
 	// send channel is used for getting data from broker (its private between broker and worker)
 	sendChannel chan []byte
@@ -28,61 +25,59 @@ type worker struct {
 // conn: http connection over TCP.
 // sen: sending channel.
 // rec: receive channel.
-func newWorker(id int, conn net.Conn, sen, rec chan []byte, status chan int) *worker {
+func newWorker(id int, conn net.Conn, sen, rec chan []byte, sts chan int) *worker {
 	return &worker{
-		id:         id,
-		connection: conn,
+		id: id,
+		network: network{
+			connection: conn,
+		},
 
 		sendChannel:    sen,
 		receiveChannel: rec,
-		statusChannel:  status,
+		statusChannel:  sts,
 	}
 }
 
 // Start will start our worker.
 func (w *worker) start() {
 	// start for input data
-	go w.receive()
+	go w.arrival()
 
 	// wait for any interrupt in send channel
 	for {
 		select {
 		case data := <-w.sendChannel:
-			w.send(data)
+			w.transfer(data)
 		}
 	}
 }
 
-// send will send a data byte through handler.
-func (w *worker) send(data []byte) {
-	writer := bufio.NewWriter(w.connection)
-	if _, err := writer.Write(data); err != nil {
+// transfer will send a data byte through handler.
+func (w *worker) transfer(data []byte) {
+	err := w.network.send(data)
+	if err != nil {
 		log.Printf("failed to send: %v\n", err)
 	}
 
-	_ = writer.Flush()
 	time.Sleep(10 * time.Millisecond)
-
-	fmt.Printf("send %d bytes\n", len(data))
 }
 
-// receive will check for input data from client.
-func (w *worker) receive() {
-	tmp := make([]byte, 1024)
+// arrival will check for input data from client.
+func (w *worker) arrival() {
+	var (
+		err    error
+		buffer = make([]byte, 1024)
+	)
 	for {
-		n, err := w.connection.Read(tmp)
+		buffer, err = w.network.get(buffer)
 		if err != nil {
-			if err != io.EOF {
-				fmt.Printf("read error: %s\n", err)
-			}
-
 			break
 		}
 
-		log.Printf("got %d bytes\n", n)
-
-		w.receiveChannel <- tmp[:n]
+		// passing data to broker channel
+		w.receiveChannel <- buffer
 	}
 
+	// announcing that the worker is done
 	w.statusChannel <- w.id
 }
