@@ -11,17 +11,23 @@ type broker struct {
 
 	// receiveChannel is a public channel between workers and broker
 	receiveChannel chan Message
-	// with statusChannel broker manages the workers status
-	statusChannel chan WorkerChannel
+	// subscribeChannel is a public channel for subscribing workers over a topic
+	subscribeChannel chan SubscribeChannel
+	// unsubscribeChannel is a public channel for unsubscribing workers from a topic
+	unsubscribeChannel chan UnsubscribeChannel
+	// terminateChannel create a channel for dead workers
+	terminateChannel chan int
 }
 
 // newBroker generates a broker.
-func newBroker(receive chan Message, status chan WorkerChannel) *broker {
+func newBroker(receive chan Message, sub chan SubscribeChannel, unsub chan UnsubscribeChannel, ter chan int) *broker {
 	return &broker{
 		workers: make(map[string][]WorkerChannel),
 
-		receiveChannel: receive,
-		statusChannel:  status,
+		receiveChannel:     receive,
+		subscribeChannel:   sub,
+		unsubscribeChannel: unsub,
+		terminateChannel:   ter,
 	}
 }
 
@@ -44,7 +50,6 @@ func (b *broker) subscribe(topic string, channel chan Message, id int) {
 		b.workers[topic],
 		WorkerChannel{
 			id:      id,
-			topic:   topic,
 			channel: channel,
 		},
 	)
@@ -53,15 +58,13 @@ func (b *broker) subscribe(topic string, channel chan Message, id int) {
 // listenToWorkers will update workers based on status channel.
 func (b *broker) listenToWorkers() {
 	for {
-		worker := <-b.statusChannel
-
-		switch worker.status {
-		case SubStatus:
+		select {
+		case worker := <-b.subscribeChannel:
 			b.subscribe(worker.topic, worker.channel, worker.id)
-		case UnsubStatus:
+		case worker := <-b.unsubscribeChannel:
 			b.unsubscribe(worker.topic, worker.id)
-		case TerminateStatus:
-			b.removeDeadWorker(worker.id)
+		case id := <-b.terminateChannel:
+			b.removeDeadWorker(id)
 		}
 	}
 }

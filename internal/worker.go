@@ -16,8 +16,12 @@ type worker struct {
 	sendChannel chan Message
 	// receive channel is used for sending data to broker (its public)
 	receiveChannel chan Message
-	// status channel
-	statusChannel chan WorkerChannel
+	// subscribeChannel is a public channel for subscribing workers over a topic
+	subscribeChannel chan SubscribeChannel
+	// unsubscribeChannel is a public channel for unsubscribing workers from a topic
+	unsubscribeChannel chan UnsubscribeChannel
+	// terminateChannel create a channel for dead workers
+	terminateChannel chan int
 }
 
 // newWorker generates a new worker.
@@ -25,16 +29,18 @@ type worker struct {
 // conn: http connection over TCP.
 // sen: sending channel.
 // rec: receive channel.
-func newWorker(id int, conn net.Conn, sen, rec chan Message, sts chan WorkerChannel) *worker {
+func newWorker(id int, conn net.Conn, sen, rec chan Message, sub chan SubscribeChannel, unsub chan UnsubscribeChannel, ter chan int) *worker {
 	return &worker{
 		id: id,
 		network: network{
 			connection: conn,
 		},
 
-		sendChannel:    sen,
-		receiveChannel: rec,
-		statusChannel:  sts,
+		sendChannel:        sen,
+		receiveChannel:     rec,
+		subscribeChannel:   sub,
+		unsubscribeChannel: unsub,
+		terminateChannel:   ter,
 	}
 }
 
@@ -87,25 +93,20 @@ func (w *worker) arrival() {
 			w.receiveChannel <- *m
 		case Subscribe:
 			// passing subscribe message
-			w.statusChannel <- WorkerChannel{
+			w.subscribeChannel <- SubscribeChannel{
 				id:      w.id,
-				status:  SubStatus,
 				topic:   m.Topic,
 				channel: w.sendChannel,
 			}
 		case Unsubscribe:
 			// passing unsubscribe message
-			w.statusChannel <- WorkerChannel{
-				id:     w.id,
-				topic:  m.Topic,
-				status: UnsubStatus,
+			w.unsubscribeChannel <- UnsubscribeChannel{
+				id:    w.id,
+				topic: m.Topic,
 			}
 		}
 	}
 
 	// announcing that the worker is done
-	w.statusChannel <- WorkerChannel{
-		id:     w.id,
-		status: TerminateStatus,
-	}
+	w.terminateChannel <- w.id
 }
