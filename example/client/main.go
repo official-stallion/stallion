@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/amirhnajafiz/stallion"
@@ -12,10 +11,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	client.Subscribe("snapp", func(data []byte) {
-		fmt.Println(string(data))
-	})
 
 	client.Publish("snapp", []byte("Hello"))
 
