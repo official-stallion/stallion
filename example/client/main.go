@@ -13,15 +13,15 @@ func main() {
 		panic(err)
 	}
 
-	client.Subscribe(func(data []byte) {
+	client.Subscribe("snapp", func(data []byte) {
 		fmt.Println(string(data))
 	})
 
-	client.Publish([]byte("Hello"))
+	client.Publish("snapp", []byte("Hello"))
 
 	time.Sleep(3 * time.Second)
 
-	client.Unsubscribe()
+	client.Unsubscribe("snapp")
 
 	select {}
 }
