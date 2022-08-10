@@ -17,7 +17,7 @@ func main() {
 		fmt.Println(string(data))
 	})
 
-	client.Publish("snapp", []byte("Hello"))
+	client.Publish("topic", []byte("Hello"))
 
 	time.Sleep(3 * time.Second)
 }

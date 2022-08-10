@@ -2,16 +2,22 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/amirhnajafiz/stallion"
 )
 
 func main() {
+	client, err := stallion.NewClient("localhost:9090")
+	if err != nil {
+		panic(err)
+	}
+
 	for i := 0; i < 2; i++ {
 		go func(j int) {
 			cli, er := stallion.NewClient("localhost:9090")
 			if er != nil {
-				panic(er)
+				log.Fatal(er)
 			}
 
 			cli.Subscribe("topic1", func(bytes []byte) {
@@ -26,10 +32,7 @@ func main() {
 		}(i)
 	}
 
-	client, err := stallion.NewClient("localhost:9090")
-	if err != nil {
-		panic(err)
-	}
+	time.Sleep(2 * time.Second)
 
 	client.Publish("topic1", []byte("Hello from 1"))
 	client.Publish("topic2", []byte("Hello from 2"))
