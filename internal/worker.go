@@ -25,11 +25,14 @@ type worker struct {
 }
 
 // newWorker generates a new worker.
-// id: for worker id.
-// conn: http connection over TCP.
-// sen: sending channel.
-// rec: receive channel.
-func newWorker(id int, conn net.Conn, sen, rec chan Message, sub chan SubscribeChannel, unsub chan UnsubscribeChannel, ter chan int) *worker {
+func newWorker(
+	id int,
+	conn net.Conn,
+	sen, rec chan Message,
+	sub chan SubscribeChannel,
+	unsub chan UnsubscribeChannel,
+	ter chan int,
+) *worker {
 	return &worker{
 		id: id,
 		network: network{
@@ -44,7 +47,7 @@ func newWorker(id int, conn net.Conn, sen, rec chan Message, sub chan SubscribeC
 	}
 }
 
-// Start will start our worker.
+// start will start our worker.
 func (w *worker) start() {
 	// start for input data
 	go w.arrival()

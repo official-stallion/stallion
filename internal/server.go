@@ -24,8 +24,16 @@ func NewServer(public chan Message, sub chan SubscribeChannel, unsub chan Unsubs
 }
 
 // Handle will handle the clients.
-func (s *server) Handle(conn net.Conn, public chan Message, sub chan SubscribeChannel, unsub chan UnsubscribeChannel, ter chan int) {
-	w := newWorker(s.prefix, conn, make(chan Message), public, sub, unsub, ter)
+func (s *server) Handle(conn net.Conn) {
+	w := newWorker(
+		s.prefix,
+		conn,
+		make(chan Message),
+		s.broker.receiveChannel,
+		s.broker.subscribeChannel,
+		s.broker.unsubscribeChannel,
+		s.broker.terminateChannel,
+	)
 
 	s.prefix++
 

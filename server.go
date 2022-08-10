@@ -12,12 +12,12 @@ import (
 func NewServer(port string) error {
 	// channels for public and status messages
 	channel := make(chan internal.Message)
-	sub := make(chan internal.SubscribeChannel)
-	unsub := make(chan internal.UnsubscribeChannel)
-	ter := make(chan int)
+	subscribe := make(chan internal.SubscribeChannel)
+	unsubscribe := make(chan internal.UnsubscribeChannel)
+	termination := make(chan int)
 
 	// creating a new server
-	serve := internal.NewServer(channel, sub, unsub, ter)
+	serve := internal.NewServer(channel, subscribe, unsubscribe, termination)
 
 	// listen over a port
 	listener, err := net.Listen("tcp", port)
@@ -31,6 +31,6 @@ func NewServer(port string) error {
 	for {
 		conn, _ := listener.Accept()
 
-		serve.Handle(conn, channel, sub, unsub, ter)
+		serve.Handle(conn)
 	}
 }
