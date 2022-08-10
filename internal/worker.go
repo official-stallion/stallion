@@ -88,7 +88,7 @@ func (w *worker) arrival() {
 
 		m, er := decodeMessage(buffer)
 		if er != nil {
-			log.Printf("json error: %v", er)
+			log.Printf("parse error: %v", er)
 
 			continue
 		}

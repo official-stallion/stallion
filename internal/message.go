@@ -1,14 +1,22 @@
 package internal
 
 import (
-	"encoding/json"
+	"bytes"
+	"encoding/gob"
 )
 
 // Message is what we send between worker and clients.
 type Message struct {
-	Type  int    `json:"type"`
-	Topic string `json:"topic"`
-	Data  []byte `json:"data"`
+	Type  int
+	Topic string
+	Data  []byte
+}
+
+// iom is for send message over tcp
+type iom struct {
+	Type  int
+	Topic string
+	Data  string
 }
 
 // NewMessage generates a new message type.
@@ -22,18 +30,39 @@ func newMessage(t int, topic string, data []byte) Message {
 
 // EncodeMessage will convert message to array of bytes.
 func encodeMessage(m Message) []byte {
-	bytes, _ := json.Marshal(m)
+	i := iom{
+		Type:  m.Type,
+		Topic: m.Topic,
+		Data:  string(m.Data),
+	}
 
-	return bytes
+	var buffer bytes.Buffer
+
+	enc := gob.NewEncoder(&buffer)
+
+	_ = enc.Encode(i)
+
+	return buffer.Bytes()
 }
 
 // DecodeMessage will convert array of bytes to Message.
-func decodeMessage(bytes []byte) (*Message, error) {
+func decodeMessage(buffer []byte) (*Message, error) {
 	var m Message
+	var i iom
 
-	if err := json.Unmarshal(bytes, &m); err != nil {
-		return nil, err
+	gob.Register(i)
+
+	dec := gob.NewDecoder(bytes.NewReader(buffer))
+
+	if err := dec.Decode(&i); err != nil {
+		if err != bytes.ErrTooLarge {
+			return nil, err
+		}
 	}
+
+	m.Type = i.Type
+	m.Topic = i.Topic
+	m.Data = []byte(i.Data)
 
 	return &m, nil
 }
