@@ -45,10 +45,9 @@ func (w *worker) start() {
 
 	// wait for any interrupt in send channel
 	for {
-		select {
-		case data := <-w.sendChannel:
-			w.transfer(data)
-		}
+		data := <-w.sendChannel
+
+		w.transfer(data)
 	}
 }
 

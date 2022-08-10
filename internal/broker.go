@@ -32,10 +32,9 @@ func (b *broker) start() {
 	go b.listenToWorkers()
 
 	for {
-		select {
-		case data := <-b.receiveChannel:
-			b.publish(data)
-		}
+		data := <-b.receiveChannel
+
+		b.publish(data)
 	}
 }
 
@@ -54,16 +53,15 @@ func (b *broker) subscribe(topic string, channel chan Message, id int) {
 // listenToWorkers will update workers based on status channel.
 func (b *broker) listenToWorkers() {
 	for {
-		select {
-		case worker := <-b.statusChannel:
-			switch worker.status {
-			case SubStatus:
-				b.subscribe(worker.topic, worker.channel, worker.id)
-			case UnsubStatus:
-				b.unsubscribe(worker.topic, worker.id)
-			case TerminateStatus:
-				b.removeDeadWorker(worker.id)
-			}
+		worker := <-b.statusChannel
+
+		switch worker.status {
+		case SubStatus:
+			b.subscribe(worker.topic, worker.channel, worker.id)
+		case UnsubStatus:
+			b.unsubscribe(worker.topic, worker.id)
+		case TerminateStatus:
+			b.removeDeadWorker(worker.id)
 		}
 	}
 }

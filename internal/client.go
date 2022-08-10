@@ -47,9 +47,7 @@ func (c *client) readDataFromServer() {
 		}
 
 		m, _ := decodeMessage(buffer)
-
-		switch m.Type {
-		case Text:
+		if m.Type == Text {
 			c.communicateChannel <- *m
 		}
 	}
