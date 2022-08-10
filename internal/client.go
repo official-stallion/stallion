@@ -22,6 +22,8 @@ type client struct {
 // NewClient creates a new client handler.
 func NewClient(conn net.Conn) *client {
 	c := &client{
+		topics: make(map[string]MessageHandler),
+
 		communicateChannel: make(chan Message),
 		terminateChannel:   make(chan int),
 
@@ -99,7 +101,7 @@ func (c *client) Publish(topic string, data []byte) error {
 
 // Subscribe subscribes over broker.
 func (c *client) Subscribe(topic string, handler MessageHandler) {
-	err := c.network.send(encodeMessage(newMessage(Subscribe, topic, []byte(DummyMessage))))
+	err := c.network.send(encodeMessage(newMessage(Subscribe, topic, nil)))
 	if err != nil {
 		log.Fatal(err)
 	}

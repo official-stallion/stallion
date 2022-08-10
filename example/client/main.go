@@ -13,7 +13,7 @@ func main() {
 		panic(err)
 	}
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 2; i++ {
 		go func(j int) {
 			cli, er := stallion.NewClient("localhost:9090")
 			if er != nil {
@@ -22,6 +22,14 @@ func main() {
 
 			cli.Subscribe("snapp", func(bytes []byte) {
 				log.Printf("%d: %s\n", j, string(bytes))
+			})
+
+			cli.Subscribe(" ", func(bytes []byte) {
+				log.Printf("%d: %s\n", j, string(bytes))
+			})
+
+			cli.Subscribe("snappit", func(bytes []byte) {
+				log.Printf("%d second: %s\n", j, string(bytes))
 			})
 
 			log.Printf("%d init\n", j)
@@ -33,6 +41,7 @@ func main() {
 	time.Sleep(1 * time.Second)
 
 	client.Publish("snapp", []byte("Hello"))
+	client.Publish("snappit", []byte("Hello to you"))
 
 	time.Sleep(3 * time.Second)
 
