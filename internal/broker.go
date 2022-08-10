@@ -11,23 +11,30 @@ type broker struct {
 
 	// receiveChannel is a public channel between workers and broker
 	receiveChannel chan Message
+
 	// subscribeChannel is a public channel for subscribing workers over a topic
 	subscribeChannel chan SubscribeChannel
+
 	// unsubscribeChannel is a public channel for unsubscribing workers from a topic
 	unsubscribeChannel chan UnsubscribeChannel
+
 	// terminateChannel create a channel for dead workers
 	terminateChannel chan int
 }
 
 // newBroker generates a broker.
-func newBroker(receive chan Message, sub chan SubscribeChannel, unsub chan UnsubscribeChannel, ter chan int) *broker {
+func newBroker(
+	receive chan Message,
+	subscribe chan SubscribeChannel,
+	unsubscribe chan UnsubscribeChannel,
+	termination chan int,
+) *broker {
 	return &broker{
-		workers: make(map[string][]WorkerChannel),
-
+		workers:            make(map[string][]WorkerChannel),
 		receiveChannel:     receive,
-		subscribeChannel:   sub,
-		unsubscribeChannel: unsub,
-		terminateChannel:   ter,
+		subscribeChannel:   subscribe,
+		unsubscribeChannel: unsubscribe,
+		terminateChannel:   termination,
 	}
 }
 
@@ -35,8 +42,10 @@ func newBroker(receive chan Message, sub chan SubscribeChannel, unsub chan Unsub
 func (b *broker) start() {
 	log.Printf("broker server start ...\n")
 
+	// start a process to listen to our workers
 	go b.listenToWorkers()
 
+	// wait for receive channel messages
 	for {
 		data := <-b.receiveChannel
 

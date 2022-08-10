@@ -42,18 +42,15 @@ func encodeMessage(m Message) []byte {
 
 // DecodeMessage will convert array of bytes to Message.
 func decodeMessage(buffer []byte) (*Message, error) {
-	var (
-		m Message
-		i jsonMessage
-	)
+	var i jsonMessage
 
 	if err := json.Unmarshal(buffer, &i); err != nil {
 		return nil, err
 	}
 
-	m.Type = i.Type
-	m.Topic = i.Topic
-	m.Data = []byte(i.Data)
-
-	return &m, nil
+	return &Message{
+		Type:  i.Type,
+		Topic: i.Topic,
+		Data:  []byte(i.Data),
+	}, nil
 }

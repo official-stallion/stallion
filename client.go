@@ -12,8 +12,10 @@ import (
 type Client interface {
 	// Publish messages to broker
 	Publish(topic string, data []byte) error
+
 	// Subscribe over broker
 	Subscribe(topic string, handler internal.MessageHandler)
+
 	// Unsubscribe from broker
 	Unsubscribe(topic string)
 }

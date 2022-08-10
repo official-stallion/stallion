@@ -11,13 +11,18 @@ type server struct {
 }
 
 // NewServer returns a new broker server.
-func NewServer(public chan Message, sub chan SubscribeChannel, unsub chan UnsubscribeChannel, ter chan int) *server {
+func NewServer(
+	public chan Message,
+	subscribe chan SubscribeChannel,
+	unsubscribe chan UnsubscribeChannel,
+	termination chan int,
+) *server {
 	s := &server{
 		prefix: 101,
 	}
 
 	// setting up the server broker and starting it
-	s.broker = newBroker(public, sub, unsub, ter)
+	s.broker = newBroker(public, subscribe, unsubscribe, termination)
 	go s.broker.start()
 
 	return s
@@ -28,9 +33,7 @@ func (s *server) Handle(conn net.Conn) {
 	w := newWorker(
 		s.prefix,
 		conn,
-
 		make(chan Message),
-
 		s.broker.receiveChannel,
 		s.broker.subscribeChannel,
 		s.broker.unsubscribeChannel,

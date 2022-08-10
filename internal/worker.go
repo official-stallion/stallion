@@ -9,17 +9,24 @@ import (
 // worker handles a single client that wants
 // to either subscribe or publish.
 type worker struct {
-	id      int
+	// each worker has its unique id
+	id int
+
+	// for network socket handling
 	network network
 
 	// send channel is used for getting data from broker (its private between broker and worker)
 	sendChannel chan Message
+
 	// receive channel is used for sending data to broker (its public)
 	receiveChannel chan Message
+
 	// subscribeChannel is a public channel for subscribing workers over a topic
 	subscribeChannel chan SubscribeChannel
+
 	// unsubscribeChannel is a public channel for unsubscribing workers from a topic
 	unsubscribeChannel chan UnsubscribeChannel
+
 	// terminateChannel create a channel for dead workers
 	terminateChannel chan int
 }
@@ -38,7 +45,6 @@ func newWorker(
 		network: network{
 			connection: conn,
 		},
-
 		sendChannel:        sen,
 		receiveChannel:     rec,
 		subscribeChannel:   sub,
@@ -75,9 +81,7 @@ func (w *worker) transfer(data Message) {
 
 // arrival will check for input data from client.
 func (w *worker) arrival() {
-	var (
-		buffer = make([]byte, 2048)
-	)
+	var buffer = make([]byte, 2048)
 
 	for {
 		tmp, err := w.network.get(buffer)
@@ -92,26 +96,32 @@ func (w *worker) arrival() {
 			continue
 		}
 
-		switch m.Type {
-		case Text:
-			// passing data to broker channel
-			w.receiveChannel <- *m
-		case Subscribe:
-			// passing subscribe message
-			w.subscribeChannel <- SubscribeChannel{
-				id:      w.id,
-				topic:   m.Topic,
-				channel: w.sendChannel,
-			}
-		case Unsubscribe:
-			// passing unsubscribe message
-			w.unsubscribeChannel <- UnsubscribeChannel{
-				id:    w.id,
-				topic: m.Topic,
-			}
-		}
+		// handle input messages
+		w.handle(m)
 	}
 
 	// announcing that the worker is done
 	w.terminateChannel <- w.id
+}
+
+// handle method responses to given messages.
+func (w *worker) handle(m *Message) {
+	switch m.Type {
+	case Text:
+		// passing data to broker channel
+		w.receiveChannel <- *m
+	case Subscribe:
+		// passing subscribe message
+		w.subscribeChannel <- SubscribeChannel{
+			id:      w.id,
+			topic:   m.Topic,
+			channel: w.sendChannel,
+		}
+	case Unsubscribe:
+		// passing unsubscribe message
+		w.unsubscribeChannel <- UnsubscribeChannel{
+			id:    w.id,
+			topic: m.Topic,
+		}
+	}
 }

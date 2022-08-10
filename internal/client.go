@@ -10,12 +10,15 @@ import (
 type client struct {
 	// map of topics
 	topics map[string]MessageHandler
+
 	// communication channel allows a client to make
 	// a connection channel between read data and subscribers
 	communicateChannel chan Message
+
 	// terminate channel is used to close a subscribe channel
 	terminateChannel chan int
 
+	// network handles the client socket data transfers
 	network network
 }
 
@@ -34,6 +37,7 @@ func NewClient(conn net.Conn) *client {
 
 	// starting data reader
 	go c.readDataFromServer()
+
 	// start listening on channels
 	go c.listen()
 
@@ -42,22 +46,24 @@ func NewClient(conn net.Conn) *client {
 
 // readDataFromServer gets all data from server.
 func (c *client) readDataFromServer() {
-	var (
-		buffer = make([]byte, 2048)
-	)
+	var buffer = make([]byte, 2048)
 
 	for {
-		tmp, err := c.network.get(buffer)
-		if err != nil {
+		// read data from network
+		tmp, er := c.network.get(buffer)
+		if er != nil {
 			break
 		}
 
-		m, _ := decodeMessage(tmp)
-		if m.Type == Text {
-			c.communicateChannel <- *m
+		// decode message
+		if m, err := decodeMessage(tmp); err == nil {
+			if m.Type == Text {
+				c.communicateChannel <- *m
+			}
 		}
 	}
 
+	// close
 	c.terminateChannel <- 1
 }
 
@@ -83,7 +89,6 @@ func (c *client) close() {
 	_ = c.network.connection.Close()
 
 	close(c.communicateChannel)
-	close(c.terminateChannel)
 }
 
 // Publish will send a message to broker server.
