@@ -9,7 +9,7 @@ import (
 type client struct {
 	// communication channel allows a client to make
 	// a connection channel between read data and subscribers
-	communicateChannel chan []byte
+	communicateChannel chan Message
 	// terminate channel is used to close a subscribe channel
 	terminateChannel chan int
 
@@ -19,7 +19,7 @@ type client struct {
 // NewClient creates a new client handler.
 func NewClient(conn net.Conn) *client {
 	c := &client{
-		communicateChannel: make(chan []byte),
+		communicateChannel: make(chan Message),
 		terminateChannel:   make(chan int),
 
 		network: network{
@@ -50,7 +50,7 @@ func (c *client) readDataFromServer() {
 
 		switch m.Type {
 		case Text:
-			c.communicateChannel <- m.Data
+			c.communicateChannel <- *m
 		}
 	}
 }
@@ -78,7 +78,7 @@ func (c *client) Subscribe(handler MessageHandler) {
 		for flag {
 			select {
 			case data := <-c.communicateChannel:
-				handler(data)
+				handler(data.Data)
 			case <-c.terminateChannel:
 				flag = false
 			}

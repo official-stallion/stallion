@@ -7,5 +7,5 @@ type MessageHandler func([]byte)
 type WorkChan struct {
 	id      int
 	status  int
-	channel chan []byte
+	channel chan Message
 }

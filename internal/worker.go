@@ -13,9 +13,9 @@ type worker struct {
 	network network
 
 	// send channel is used for getting data from broker (its private between broker and worker)
-	sendChannel chan []byte
+	sendChannel chan Message
 	// receive channel is used for sending data to broker (its public)
-	receiveChannel chan []byte
+	receiveChannel chan Message
 	// status channel
 	statusChannel chan WorkChan
 }
@@ -25,7 +25,7 @@ type worker struct {
 // conn: http connection over TCP.
 // sen: sending channel.
 // rec: receive channel.
-func newWorker(id int, conn net.Conn, sen, rec chan []byte, sts chan WorkChan) *worker {
+func newWorker(id int, conn net.Conn, sen, rec chan Message, sts chan WorkChan) *worker {
 	return &worker{
 		id: id,
 		network: network{
@@ -53,8 +53,8 @@ func (w *worker) start() {
 }
 
 // transfer will send a data byte through handler.
-func (w *worker) transfer(data []byte) {
-	err := w.network.send(encodeMessage(newMessage(Text, data)))
+func (w *worker) transfer(data Message) {
+	err := w.network.send(encodeMessage(data))
 	if err != nil {
 		log.Printf("failed to send: %v\n", err)
 	}
@@ -85,7 +85,7 @@ func (w *worker) arrival() {
 		switch m.Type {
 		case Text:
 			// passing data to broker channel
-			w.receiveChannel <- m.Data
+			w.receiveChannel <- *m
 		case Subscribe:
 			// passing subscribe message
 			w.statusChannel <- WorkChan{
