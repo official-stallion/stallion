@@ -6,6 +6,6 @@ type MessageHandler func([]byte)
 // WorkChan is worker channel with its id.
 type WorkChan struct {
 	id      int
-	status  bool
+	status  int
 	channel chan []byte
 }

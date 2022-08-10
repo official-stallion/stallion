@@ -7,7 +7,7 @@ import (
 // broker handles the message sending and receiving.
 type broker struct {
 	// list of broker workers
-	workers []WorkChan
+	workers map[string][]WorkChan
 
 	// receiveChannel is a public channel between workers and broker
 	receiveChannel chan []byte
@@ -18,6 +18,8 @@ type broker struct {
 // newBroker generates a broker.
 func newBroker(receive chan []byte, status chan WorkChan) *broker {
 	return &broker{
+		workers: make(map[string][]WorkChan),
+
 		receiveChannel: receive,
 		statusChannel:  status,
 	}
@@ -32,15 +34,15 @@ func (b *broker) start() {
 	for {
 		select {
 		case data := <-b.receiveChannel:
-			b.publish(data)
+			b.publish("", data)
 		}
 	}
 }
 
 // subscribe will add subscribers to our broker.
-func (b *broker) subscribe(channel chan []byte, id int) {
-	b.workers = append(
-		b.workers,
+func (b *broker) subscribe(topic string, channel chan []byte, id int) {
+	b.workers[topic] = append(
+		b.workers[topic],
 		WorkChan{
 			id:      id,
 			channel: channel,
@@ -53,29 +55,39 @@ func (b *broker) listenToWorkers() {
 	for {
 		select {
 		case worker := <-b.statusChannel:
-			if worker.status {
-				b.subscribe(worker.channel, worker.id)
-			} else {
+			switch worker.status {
+			case 1:
+				b.subscribe("", worker.channel, worker.id)
+			case 2:
+				b.unsubscribe("", worker.id)
+			case 3:
 				b.removeDeadWorker(worker.id)
 			}
 		}
 	}
 }
 
-// removeDeadWorker will remove a channel from broker list.
-func (b *broker) removeDeadWorker(id int) {
-	for index, value := range b.workers {
+// unsubscribe removes a worker channel from a topic.
+func (b *broker) unsubscribe(topic string, id int) {
+	for index, value := range b.workers[topic] {
 		if value.id == id {
-			b.workers = append(b.workers[:index], b.workers[index+1:]...)
+			b.workers[topic] = append(b.workers[topic][:index], b.workers[topic][index+1:]...)
 
 			break
 		}
 	}
 }
 
+// removeDeadWorker will remove a channel from broker list.
+func (b *broker) removeDeadWorker(id int) {
+	for key := range b.workers {
+		b.unsubscribe(key, id)
+	}
+}
+
 // publish will send a data over channels.
-func (b *broker) publish(data []byte) {
-	for _, w := range b.workers {
+func (b *broker) publish(topic string, data []byte) {
+	for _, w := range b.workers[topic] {
 		w.channel <- data
 	}
 }

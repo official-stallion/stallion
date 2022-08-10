@@ -90,14 +90,14 @@ func (w *worker) arrival() {
 			// passing subscribe message
 			w.statusChannel <- WorkChan{
 				id:      w.id,
-				status:  true,
+				status:  1,
 				channel: w.sendChannel,
 			}
 		case Unsubscribe:
 			// passing unsubscribe message
 			w.statusChannel <- WorkChan{
 				id:     w.id,
-				status: false,
+				status: 2,
 			}
 		}
 	}
@@ -105,6 +105,6 @@ func (w *worker) arrival() {
 	// announcing that the worker is done
 	w.statusChannel <- WorkChan{
 		id:     w.id,
-		status: false,
+		status: 3,
 	}
 }
