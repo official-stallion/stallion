@@ -28,7 +28,9 @@ func (s *server) Handle(conn net.Conn) {
 	w := newWorker(
 		s.prefix,
 		conn,
+
 		make(chan Message),
+
 		s.broker.receiveChannel,
 		s.broker.subscribeChannel,
 		s.broker.unsubscribeChannel,

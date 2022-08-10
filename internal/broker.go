@@ -44,6 +44,20 @@ func (b *broker) start() {
 	}
 }
 
+// listenToWorkers will update workers based on status channel.
+func (b *broker) listenToWorkers() {
+	for {
+		select {
+		case packet := <-b.subscribeChannel:
+			b.subscribe(packet.topic, packet.channel, packet.id)
+		case packet := <-b.unsubscribeChannel:
+			b.unsubscribe(packet.topic, packet.id)
+		case id := <-b.terminateChannel:
+			b.removeDeadWorker(id)
+		}
+	}
+}
+
 // subscribe will add subscribers to our broker.
 func (b *broker) subscribe(topic string, channel chan Message, id int) {
 	b.workers[topic] = append(
@@ -53,20 +67,6 @@ func (b *broker) subscribe(topic string, channel chan Message, id int) {
 			channel: channel,
 		},
 	)
-}
-
-// listenToWorkers will update workers based on status channel.
-func (b *broker) listenToWorkers() {
-	for {
-		select {
-		case worker := <-b.subscribeChannel:
-			b.subscribe(worker.topic, worker.channel, worker.id)
-		case worker := <-b.unsubscribeChannel:
-			b.unsubscribe(worker.topic, worker.id)
-		case id := <-b.terminateChannel:
-			b.removeDeadWorker(id)
-		}
-	}
 }
 
 // unsubscribe removes a worker channel from a topic.
