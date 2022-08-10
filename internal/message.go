@@ -5,29 +5,30 @@ import (
 )
 
 // Message is what we send between worker and clients.
-type message struct {
-	Type int    `json:"type"`
-	Data []byte `json:"data"`
+type Message struct {
+	Type  int    `json:"type"`
+	Topic string `json:"topic"`
+	Data  []byte `json:"data"`
 }
 
 // NewMessage generates a new message type.
-func newMessage(t int, data []byte) message {
-	return message{
+func newMessage(t int, data []byte) Message {
+	return Message{
 		Type: t,
 		Data: data,
 	}
 }
 
 // EncodeMessage will convert message to array of bytes.
-func encodeMessage(m message) []byte {
+func encodeMessage(m Message) []byte {
 	bytes, _ := json.Marshal(m)
 
 	return bytes
 }
 
 // DecodeMessage will convert array of bytes to Message.
-func decodeMessage(bytes []byte) (*message, error) {
-	var m message
+func decodeMessage(bytes []byte) (*Message, error) {
+	var m Message
 
 	if err := json.Unmarshal(bytes, &m); err != nil {
 		return nil, err

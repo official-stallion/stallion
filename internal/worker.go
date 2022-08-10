@@ -54,7 +54,7 @@ func (w *worker) start() {
 
 // transfer will send a data byte through handler.
 func (w *worker) transfer(data []byte) {
-	err := w.network.send(encodeMessage(newMessage(Message, data)))
+	err := w.network.send(encodeMessage(newMessage(Text, data)))
 	if err != nil {
 		log.Printf("failed to send: %v\n", err)
 	}
@@ -83,7 +83,7 @@ func (w *worker) arrival() {
 		}
 
 		switch m.Type {
-		case Message:
+		case Text:
 			// passing data to broker channel
 			w.receiveChannel <- m.Data
 		case Subscribe:

@@ -49,7 +49,7 @@ func (c *client) readDataFromServer() {
 		m, _ := decodeMessage(buffer)
 
 		switch m.Type {
-		case Message:
+		case Text:
 			c.communicateChannel <- m.Data
 		}
 	}
@@ -57,7 +57,7 @@ func (c *client) readDataFromServer() {
 
 // Publish will send a message to broker server.
 func (c *client) Publish(data []byte) error {
-	err := c.network.send(encodeMessage(newMessage(Message, data)))
+	err := c.network.send(encodeMessage(newMessage(Text, data)))
 	if err != nil {
 		return err
 	}
