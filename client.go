@@ -11,11 +11,11 @@ import (
 // to communicate with broker server.
 type Client interface {
 	// Publish messages to broker
-	Publish([]byte) error
+	Publish(topic string, data []byte) error
 	// Subscribe over broker
-	Subscribe(handler internal.MessageHandler)
+	Subscribe(topic string, handler internal.MessageHandler)
 	// Unsubscribe from broker
-	Unsubscribe()
+	Unsubscribe(topic string)
 }
 
 // NewClient creates a new client to connect to broker server.

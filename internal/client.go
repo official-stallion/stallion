@@ -56,8 +56,8 @@ func (c *client) readDataFromServer() {
 }
 
 // Publish will send a message to broker server.
-func (c *client) Publish(data []byte) error {
-	err := c.network.send(encodeMessage(newMessage(Text, data)))
+func (c *client) Publish(topic string, data []byte) error {
+	err := c.network.send(encodeMessage(newMessage(Text, topic, data)))
 	if err != nil {
 		return err
 	}
@@ -68,8 +68,8 @@ func (c *client) Publish(data []byte) error {
 }
 
 // Subscribe subscribes over broker.
-func (c *client) Subscribe(handler MessageHandler) {
-	_ = c.network.send(encodeMessage(newMessage(Subscribe, []byte(DummyMessage))))
+func (c *client) Subscribe(topic string, handler MessageHandler) {
+	_ = c.network.send(encodeMessage(newMessage(Subscribe, topic, []byte(DummyMessage))))
 	time.Sleep(10 * time.Millisecond)
 
 	go func() {
@@ -86,8 +86,8 @@ func (c *client) Subscribe(handler MessageHandler) {
 	}()
 }
 
-func (c *client) Unsubscribe() {
-	_ = c.network.send(encodeMessage(newMessage(Unsubscribe, nil)))
+func (c *client) Unsubscribe(topic string) {
+	_ = c.network.send(encodeMessage(newMessage(Unsubscribe, topic, nil)))
 	time.Sleep(10 * time.Millisecond)
 
 	c.terminateChannel <- 1

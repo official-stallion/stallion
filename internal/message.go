@@ -12,10 +12,11 @@ type Message struct {
 }
 
 // NewMessage generates a new message type.
-func newMessage(t int, data []byte) Message {
+func newMessage(t int, topic string, data []byte) Message {
 	return Message{
-		Type: t,
-		Data: data,
+		Type:  t,
+		Topic: topic,
+		Data:  data,
 	}
 }
 
