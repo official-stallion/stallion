@@ -24,10 +24,6 @@ func main() {
 				log.Printf("%d: %s\n", j, string(bytes))
 			})
 
-			cli.Subscribe(" ", func(bytes []byte) {
-				log.Printf("%d: %s\n", j, string(bytes))
-			})
-
 			cli.Subscribe("snappit", func(bytes []byte) {
 				log.Printf("%d second: %s\n", j, string(bytes))
 			})
