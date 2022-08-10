@@ -56,11 +56,11 @@ func (b *broker) listenToWorkers() {
 		select {
 		case worker := <-b.statusChannel:
 			switch worker.status {
-			case 1:
+			case SubStatus:
 				b.subscribe("", worker.channel, worker.id)
-			case 2:
+			case UnsubStatus:
 				b.unsubscribe("", worker.id)
-			case 3:
+			case TerminateStatus:
 				b.removeDeadWorker(worker.id)
 			}
 		}
