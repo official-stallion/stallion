@@ -1,12 +1,15 @@
 package internal
 
 import (
+	"log"
 	"net"
 	"time"
 )
 
 // client is our user application handler.
 type client struct {
+	// map of topics
+	topics map[string]MessageHandler
 	// communication channel allows a client to make
 	// a connection channel between read data and subscribers
 	communicateChannel chan Message
@@ -29,6 +32,8 @@ func NewClient(conn net.Conn) *client {
 
 	// starting data reader
 	go c.readDataFromServer()
+	// start listening on channels
+	go c.listen()
 
 	return c
 }
@@ -51,6 +56,33 @@ func (c *client) readDataFromServer() {
 			c.communicateChannel <- *m
 		}
 	}
+
+	c.terminateChannel <- 1
+}
+
+// listen method watches channels for input data.
+func (c *client) listen() {
+	for {
+		select {
+		case data := <-c.communicateChannel:
+			c.handle(data)
+		case <-c.terminateChannel:
+			c.close()
+		}
+	}
+}
+
+// handle will execute the topic handler method.
+func (c *client) handle(m Message) {
+	c.topics[m.Topic](m.Data)
+}
+
+// close will terminate everything.
+func (c *client) close() {
+	_ = c.network.connection.Close()
+
+	close(c.communicateChannel)
+	close(c.terminateChannel)
 }
 
 // Publish will send a message to broker server.
@@ -67,26 +99,21 @@ func (c *client) Publish(topic string, data []byte) error {
 
 // Subscribe subscribes over broker.
 func (c *client) Subscribe(topic string, handler MessageHandler) {
-	_ = c.network.send(encodeMessage(newMessage(Subscribe, topic, []byte(DummyMessage))))
+	err := c.network.send(encodeMessage(newMessage(Subscribe, topic, []byte(DummyMessage))))
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	time.Sleep(10 * time.Millisecond)
 
-	go func() {
-		flag := true
-
-		for flag {
-			select {
-			case data := <-c.communicateChannel:
-				handler(data.Data)
-			case <-c.terminateChannel:
-				flag = false
-			}
-		}
-	}()
+	// set a handler for given topic
+	c.topics[topic] = handler
 }
 
 func (c *client) Unsubscribe(topic string) {
 	_ = c.network.send(encodeMessage(newMessage(Unsubscribe, topic, nil)))
 	time.Sleep(10 * time.Millisecond)
 
-	c.terminateChannel <- 1
+	// remove topic and its handler
+	delete(c.topics, topic)
 }

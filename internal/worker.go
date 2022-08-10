@@ -49,6 +49,9 @@ func newWorker(
 
 // start will start our worker.
 func (w *worker) start() {
+	// closing channel after we are done
+	defer close(w.sendChannel)
+
 	// start for input data
 	go w.arrival()
 
