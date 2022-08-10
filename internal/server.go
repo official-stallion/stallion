@@ -11,7 +11,7 @@ type server struct {
 }
 
 // NewServer returns a new broker server.
-func NewServer(public chan Message, status chan WorkChan) *server {
+func NewServer(public chan Message, status chan WorkerChannel) *server {
 	s := &server{
 		prefix: 101,
 	}
@@ -24,7 +24,7 @@ func NewServer(public chan Message, status chan WorkChan) *server {
 }
 
 // Handle will handle the clients.
-func (s *server) Handle(conn net.Conn, public chan Message, status chan WorkChan) {
+func (s *server) Handle(conn net.Conn, public chan Message, status chan WorkerChannel) {
 	w := newWorker(s.prefix, conn, make(chan Message), public, status)
 
 	s.prefix++

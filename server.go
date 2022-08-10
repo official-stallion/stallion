@@ -12,7 +12,7 @@ import (
 func NewServer(port string) error {
 	// channels for public and status messages
 	channel := make(chan internal.Message)
-	status := make(chan internal.WorkChan)
+	status := make(chan internal.WorkerChannel)
 
 	// creating a new server
 	serve := internal.NewServer(channel, status)

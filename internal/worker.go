@@ -17,7 +17,7 @@ type worker struct {
 	// receive channel is used for sending data to broker (its public)
 	receiveChannel chan Message
 	// status channel
-	statusChannel chan WorkChan
+	statusChannel chan WorkerChannel
 }
 
 // newWorker generates a new worker.
@@ -25,7 +25,7 @@ type worker struct {
 // conn: http connection over TCP.
 // sen: sending channel.
 // rec: receive channel.
-func newWorker(id int, conn net.Conn, sen, rec chan Message, sts chan WorkChan) *worker {
+func newWorker(id int, conn net.Conn, sen, rec chan Message, sts chan WorkerChannel) *worker {
 	return &worker{
 		id: id,
 		network: network{
@@ -88,7 +88,7 @@ func (w *worker) arrival() {
 			w.receiveChannel <- *m
 		case Subscribe:
 			// passing subscribe message
-			w.statusChannel <- WorkChan{
+			w.statusChannel <- WorkerChannel{
 				id:      w.id,
 				status:  SubStatus,
 				topic:   m.Topic,
@@ -96,7 +96,7 @@ func (w *worker) arrival() {
 			}
 		case Unsubscribe:
 			// passing unsubscribe message
-			w.statusChannel <- WorkChan{
+			w.statusChannel <- WorkerChannel{
 				id:     w.id,
 				topic:  m.Topic,
 				status: UnsubStatus,
@@ -105,7 +105,7 @@ func (w *worker) arrival() {
 	}
 
 	// announcing that the worker is done
-	w.statusChannel <- WorkChan{
+	w.statusChannel <- WorkerChannel{
 		id:     w.id,
 		status: TerminateStatus,
 	}

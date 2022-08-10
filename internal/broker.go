@@ -7,18 +7,18 @@ import (
 // broker handles the message sending and receiving.
 type broker struct {
 	// list of broker workers
-	workers map[string][]WorkChan
+	workers map[string][]WorkerChannel
 
 	// receiveChannel is a public channel between workers and broker
 	receiveChannel chan Message
 	// with statusChannel broker manages the workers status
-	statusChannel chan WorkChan
+	statusChannel chan WorkerChannel
 }
 
 // newBroker generates a broker.
-func newBroker(receive chan Message, status chan WorkChan) *broker {
+func newBroker(receive chan Message, status chan WorkerChannel) *broker {
 	return &broker{
-		workers: make(map[string][]WorkChan),
+		workers: make(map[string][]WorkerChannel),
 
 		receiveChannel: receive,
 		statusChannel:  status,
@@ -43,8 +43,9 @@ func (b *broker) start() {
 func (b *broker) subscribe(topic string, channel chan Message, id int) {
 	b.workers[topic] = append(
 		b.workers[topic],
-		WorkChan{
+		WorkerChannel{
 			id:      id,
+			topic:   topic,
 			channel: channel,
 		},
 	)
