@@ -76,17 +76,16 @@ func (w *worker) transfer(data Message) {
 // arrival will check for input data from client.
 func (w *worker) arrival() {
 	var (
-		err    error
-		buffer = make([]byte, 1024)
+		buffer = make([]byte, 2048)
 	)
 
 	for {
-		buffer, err = w.network.get(buffer)
+		tmp, err := w.network.get(buffer)
 		if err != nil {
 			break
 		}
 
-		m, er := decodeMessage(buffer)
+		m, er := decodeMessage(tmp)
 		if er != nil {
 			log.Printf("parse error: %v", er)
 

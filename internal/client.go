@@ -43,17 +43,16 @@ func NewClient(conn net.Conn) *client {
 // readDataFromServer gets all data from server.
 func (c *client) readDataFromServer() {
 	var (
-		err    error
-		buffer = make([]byte, 1024)
+		buffer = make([]byte, 2048)
 	)
 
 	for {
-		buffer, err = c.network.get(buffer)
+		tmp, err := c.network.get(buffer)
 		if err != nil {
 			break
 		}
 
-		m, _ := decodeMessage(buffer)
+		m, _ := decodeMessage(tmp)
 		if m.Type == Text {
 			c.communicateChannel <- *m
 		}
