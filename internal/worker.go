@@ -91,12 +91,14 @@ func (w *worker) arrival() {
 			w.statusChannel <- WorkChan{
 				id:      w.id,
 				status:  SubStatus,
+				topic:   m.Topic,
 				channel: w.sendChannel,
 			}
 		case Unsubscribe:
 			// passing unsubscribe message
 			w.statusChannel <- WorkChan{
 				id:     w.id,
+				topic:  m.Topic,
 				status: UnsubStatus,
 			}
 		}
