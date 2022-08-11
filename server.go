@@ -10,14 +10,8 @@ import (
 
 // NewServer creates a new broker server on given port.
 func NewServer(port string) error {
-	// channels for public and status messages
-	channel := make(chan internal.Message)
-	subscribe := make(chan internal.SubscribeChannel)
-	unsubscribe := make(chan internal.UnsubscribeChannel)
-	termination := make(chan int)
-
 	// creating a new server
-	serve := internal.NewServer(channel, subscribe, unsubscribe, termination)
+	serve := internal.NewServer()
 
 	// listen over a port
 	listener, err := net.Listen("tcp", port)

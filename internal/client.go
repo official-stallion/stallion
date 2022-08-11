@@ -25,11 +25,9 @@ type client struct {
 // NewClient creates a new client handler.
 func NewClient(conn net.Conn) *client {
 	c := &client{
-		topics: make(map[string]MessageHandler),
-
+		topics:             make(map[string]MessageHandler),
 		communicateChannel: make(chan Message),
 		terminateChannel:   make(chan int),
-
 		network: network{
 			connection: conn,
 		},
