@@ -9,8 +9,8 @@
 <img src="https://img.shields.io/badge/Linux-white?style=for-the-badge&logo=linux" alt="version" />
 </p>
 
-
-Fast message broker implemented with Golang programming language.
+Fast message broker implemented with Golang programming language.<br />
+Using no external libraries, just internal Golang libraries.
 
 ## How to use?
 Get package:
