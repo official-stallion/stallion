@@ -4,9 +4,10 @@
 
 <p align="center">
 <img src="https://img.shields.io/badge/Golang-1.18-66ADD8?style=for-the-badge&logo=go" alt="go version" />
-<img src="https://img.shields.io/badge/Version-1.0.0-red?style=for-the-badge&logo=none" alt="version" /><br />
+<img src="https://img.shields.io/badge/Version-1.1.1-red?style=for-the-badge&logo=none" alt="version" /><br />
 <img src="https://img.shields.io/badge/MacOS-black?style=for-the-badge&logo=apple" alt="version" />
 <img src="https://img.shields.io/badge/Linux-white?style=for-the-badge&logo=linux" alt="version" />
+<img src="https://img.shields.io/badge/Windows-blue?style=for-the-badge&logo=windows" alt="version" />
 </p>
 
 Fast message broker implemented with Golang programming language.<br />
