@@ -85,7 +85,9 @@ func (c *client) listen() {
 
 // handle will execute the topic handler method.
 func (c *client) handle(m message) {
-	c.topics[m.Topic](m.Data)
+	if handler, ok := c.topics[m.Topic]; ok {
+		handler(m.Data)
+	}
 }
 
 // close will terminate everything.
