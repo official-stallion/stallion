@@ -49,7 +49,7 @@ func (b *broker) start() {
 	for {
 		data := <-b.receiveChannel
 
-		b.publish(data)
+		go b.publish(data)
 	}
 }
 

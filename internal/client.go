@@ -87,8 +87,6 @@ func (c *client) handle(m Message) {
 // close will terminate everything.
 func (c *client) close() {
 	_ = c.network.connection.Close()
-
-	close(c.communicateChannel)
 }
 
 // Publish will send a message to broker server.
@@ -98,7 +96,7 @@ func (c *client) Publish(topic string, data []byte) error {
 		return err
 	}
 
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(1 * time.Millisecond)
 
 	return nil
 }
@@ -110,7 +108,7 @@ func (c *client) Subscribe(topic string, handler MessageHandler) {
 		log.Fatal(err)
 	}
 
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(1 * time.Millisecond)
 
 	// set a handler for given topic
 	c.topics[topic] = handler
@@ -118,7 +116,7 @@ func (c *client) Subscribe(topic string, handler MessageHandler) {
 
 func (c *client) Unsubscribe(topic string) {
 	_ = c.network.send(encodeMessage(newMessage(Unsubscribe, topic, nil)))
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(1 * time.Millisecond)
 
 	// remove topic and its handler
 	delete(c.topics, topic)

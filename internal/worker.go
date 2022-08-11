@@ -76,7 +76,7 @@ func (w *worker) transfer(data Message) {
 		log.Printf("failed to send: %v\n", err)
 	}
 
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(1 * time.Millisecond)
 }
 
 // arrival will check for input data from client.
