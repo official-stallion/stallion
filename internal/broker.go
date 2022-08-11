@@ -7,16 +7,16 @@ import (
 // broker handles the message sending and receiving.
 type broker struct {
 	// list of broker workers
-	workers map[string][]WorkerChannel
+	workers map[string][]workerChannel
 
 	// receiveChannel is a public channel between workers and broker
 	receiveChannel chan Message
 
 	// subscribeChannel is a public channel for subscribing workers over a topic
-	subscribeChannel chan SubscribeChannel
+	subscribeChannel chan subscribeChannel
 
 	// unsubscribeChannel is a public channel for unsubscribing workers from a topic
-	unsubscribeChannel chan UnsubscribeChannel
+	unsubscribeChannel chan unsubscribeChannel
 
 	// terminateChannel create a channel for dead workers
 	terminateChannel chan int
@@ -25,12 +25,12 @@ type broker struct {
 // newBroker generates a broker.
 func newBroker(
 	receive chan Message,
-	subscribe chan SubscribeChannel,
-	unsubscribe chan UnsubscribeChannel,
+	subscribe chan subscribeChannel,
+	unsubscribe chan unsubscribeChannel,
 	termination chan int,
 ) *broker {
 	return &broker{
-		workers:            make(map[string][]WorkerChannel),
+		workers:            make(map[string][]workerChannel),
 		receiveChannel:     receive,
 		subscribeChannel:   subscribe,
 		unsubscribeChannel: unsubscribe,
@@ -71,7 +71,7 @@ func (b *broker) listenToWorkers() {
 func (b *broker) subscribe(topic string, channel chan Message, id int) {
 	b.workers[topic] = append(
 		b.workers[topic],
-		WorkerChannel{
+		workerChannel{
 			id:      id,
 			channel: channel,
 		},

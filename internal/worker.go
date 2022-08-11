@@ -22,10 +22,10 @@ type worker struct {
 	receiveChannel chan Message
 
 	// subscribeChannel is a public channel for subscribing workers over a topic
-	subscribeChannel chan SubscribeChannel
+	subscribeChannel chan subscribeChannel
 
 	// unsubscribeChannel is a public channel for unsubscribing workers from a topic
-	unsubscribeChannel chan UnsubscribeChannel
+	unsubscribeChannel chan unsubscribeChannel
 
 	// terminateChannel create a channel for dead workers
 	terminateChannel chan int
@@ -36,8 +36,8 @@ func newWorker(
 	id int,
 	conn net.Conn,
 	sen, rec chan Message,
-	sub chan SubscribeChannel,
-	unsub chan UnsubscribeChannel,
+	sub chan subscribeChannel,
+	unsub chan unsubscribeChannel,
 	ter chan int,
 ) *worker {
 	return &worker{
@@ -112,14 +112,14 @@ func (w *worker) handle(m *Message) {
 		w.receiveChannel <- *m
 	case Subscribe:
 		// passing subscribe message
-		w.subscribeChannel <- SubscribeChannel{
+		w.subscribeChannel <- subscribeChannel{
 			id:      w.id,
 			topic:   m.Topic,
 			channel: w.sendChannel,
 		}
 	case Unsubscribe:
 		// passing unsubscribe message
-		w.unsubscribeChannel <- UnsubscribeChannel{
+		w.unsubscribeChannel <- unsubscribeChannel{
 			id:    w.id,
 			topic: m.Topic,
 		}

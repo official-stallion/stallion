@@ -19,8 +19,8 @@ func NewServer() *server {
 	// setting up the server broker and starting it
 	s.broker = newBroker(
 		make(chan Message),
-		make(chan SubscribeChannel),
-		make(chan UnsubscribeChannel),
+		make(chan subscribeChannel),
+		make(chan unsubscribeChannel),
 		make(chan int),
 	)
 	go s.broker.start()
