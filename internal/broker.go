@@ -10,7 +10,7 @@ type broker struct {
 	workers map[string][]workerChannel
 
 	// receiveChannel is a public channel between workers and broker
-	receiveChannel chan Message
+	receiveChannel chan message
 
 	// subscribeChannel is a public channel for subscribing workers over a topic
 	subscribeChannel chan subscribeChannel
@@ -24,7 +24,7 @@ type broker struct {
 
 // newBroker generates a broker.
 func newBroker(
-	receive chan Message,
+	receive chan message,
 	subscribe chan subscribeChannel,
 	unsubscribe chan unsubscribeChannel,
 	termination chan int,
@@ -68,7 +68,7 @@ func (b *broker) listenToWorkers() {
 }
 
 // subscribe will add subscribers to our broker.
-func (b *broker) subscribe(topic string, channel chan Message, id int) {
+func (b *broker) subscribe(topic string, channel chan message, id int) {
 	b.workers[topic] = append(
 		b.workers[topic],
 		workerChannel{
@@ -97,7 +97,7 @@ func (b *broker) removeDeadWorker(id int) {
 }
 
 // publish will send a data over channels.
-func (b *broker) publish(data Message) {
+func (b *broker) publish(data message) {
 	for _, w := range b.workers[data.Topic] {
 		w.channel <- data
 	}

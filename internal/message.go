@@ -5,22 +5,15 @@ import (
 )
 
 // Message is what we send between worker and clients.
-type Message struct {
-	Type  int
-	Topic string
-	Data  []byte
-}
-
-// jsonMessage is for send message over tcp
-type jsonMessage struct {
+type message struct {
 	Type  int    `json:"type"`
 	Topic string `json:"topic"`
-	Data  string `json:"data"`
+	Data  []byte `json:"data"`
 }
 
 // NewMessage generates a new message type.
-func newMessage(t int, topic string, data []byte) Message {
-	return Message{
+func newMessage(t int, topic string, data []byte) message {
+	return message{
 		Type:  t,
 		Topic: topic,
 		Data:  data,
@@ -28,29 +21,19 @@ func newMessage(t int, topic string, data []byte) Message {
 }
 
 // EncodeMessage will convert message to array of bytes.
-func encodeMessage(m Message) []byte {
-	j := jsonMessage{
-		Type:  m.Type,
-		Topic: m.Topic,
-		Data:  string(m.Data),
-	}
-
-	bytes, _ := json.Marshal(j)
+func encodeMessage(m message) []byte {
+	bytes, _ := json.Marshal(m)
 
 	return bytes
 }
 
 // DecodeMessage will convert array of bytes to Message.
-func decodeMessage(buffer []byte) (*Message, error) {
-	var i jsonMessage
+func decodeMessage(buffer []byte) (*message, error) {
+	var m message
 
-	if err := json.Unmarshal(buffer, &i); err != nil {
+	if err := json.Unmarshal(buffer, &m); err != nil {
 		return nil, err
 	}
 
-	return &Message{
-		Type:  i.Type,
-		Topic: i.Topic,
-		Data:  []byte(i.Data),
-	}, nil
+	return &m, nil
 }

@@ -18,7 +18,7 @@ func NewServer() *server {
 
 	// setting up the server broker and starting it
 	s.broker = newBroker(
-		make(chan Message),
+		make(chan message),
 		make(chan subscribeChannel),
 		make(chan unsubscribeChannel),
 		make(chan int),
@@ -33,7 +33,7 @@ func (s *server) Handle(conn net.Conn) {
 	w := newWorker(
 		s.prefix,
 		conn,
-		make(chan Message),
+		make(chan message),
 		s.broker.receiveChannel,
 		s.broker.subscribeChannel,
 		s.broker.unsubscribeChannel,

@@ -16,10 +16,10 @@ type worker struct {
 	network network
 
 	// send channel is used for getting data from broker (its private between broker and worker)
-	sendChannel chan Message
+	sendChannel chan message
 
 	// receive channel is used for sending data to broker (its public)
-	receiveChannel chan Message
+	receiveChannel chan message
 
 	// subscribeChannel is a public channel for subscribing workers over a topic
 	subscribeChannel chan subscribeChannel
@@ -35,7 +35,7 @@ type worker struct {
 func newWorker(
 	id int,
 	conn net.Conn,
-	sen, rec chan Message,
+	sen, rec chan message,
 	sub chan subscribeChannel,
 	unsub chan unsubscribeChannel,
 	ter chan int,
@@ -70,7 +70,7 @@ func (w *worker) start() {
 }
 
 // transfer will send a data byte through handler.
-func (w *worker) transfer(data Message) {
+func (w *worker) transfer(data message) {
 	err := w.network.send(encodeMessage(data))
 	if err != nil {
 		log.Printf("failed to send: %v\n", err)
@@ -105,7 +105,7 @@ func (w *worker) arrival() {
 }
 
 // handle method responses to given messages.
-func (w *worker) handle(m *Message) {
+func (w *worker) handle(m *message) {
 	switch m.Type {
 	case Text:
 		// passing data to broker channel

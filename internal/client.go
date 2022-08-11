@@ -13,7 +13,7 @@ type client struct {
 
 	// communication channel allows a client to make
 	// a connection channel between read data and subscribers
-	communicateChannel chan Message
+	communicateChannel chan message
 
 	// terminate channel is used to close a subscribe channel
 	terminateChannel chan int
@@ -26,7 +26,7 @@ type client struct {
 func NewClient(conn net.Conn) *client {
 	c := &client{
 		topics:             make(map[string]MessageHandler),
-		communicateChannel: make(chan Message),
+		communicateChannel: make(chan message),
 		terminateChannel:   make(chan int),
 		network: network{
 			connection: conn,
@@ -78,7 +78,7 @@ func (c *client) listen() {
 }
 
 // handle will execute the topic handler method.
-func (c *client) handle(m Message) {
+func (c *client) handle(m message) {
 	c.topics[m.Topic](m.Data)
 }
 
