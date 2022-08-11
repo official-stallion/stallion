@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"log"
@@ -15,12 +14,9 @@ type network struct {
 
 // send data over tcp.
 func (n *network) send(data []byte) error {
-	writer := bufio.NewWriter(n.connection)
-	if _, err := writer.Write(data); err != nil {
+	if _, err := n.connection.Write(data); err != nil {
 		return fmt.Errorf("failed to send: %v\n", err)
 	}
-
-	_ = writer.Flush()
 
 	return nil
 }
