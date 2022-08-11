@@ -8,6 +8,11 @@ import (
 	"github.com/amirhnajafiz/stallion/internal"
 )
 
+type Server interface {
+	// Handle method generates a new worker for clients.
+	Handle(conn net.Conn)
+}
+
 // NewServer creates a new broker server on given port.
 func NewServer(port string) error {
 	// creating a new server
@@ -23,8 +28,10 @@ func NewServer(port string) error {
 
 	// handling our clients
 	for {
-		conn, _ := listener.Accept()
-
-		serve.Handle(conn)
+		if conn, er := listener.Accept(); er == nil {
+			serve.Handle(conn)
+		} else {
+			log.Printf("error in client accept: %v\n", er)
+		}
 	}
 }
