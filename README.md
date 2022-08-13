@@ -55,14 +55,24 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	client.Subscribe("topic", func(data []byte) {
-		fmt.Println(string(data))
-	})
-
-	client.Publish("topic", []byte("Hello"))
-
-	time.Sleep(3 * time.Second)
 }
+```
+
+### Subscribe on a topic
+```go
+client.Subscribe("topic", func(data []byte) {
+    // any handler that you want
+    fmt.Println(string(data))
+})
+```
+
+### Publish over a topic
+```go
+client.Publish("topic", []byte("Hello"))
+```
+
+### Unsubscribe from a topic
+```go
+client.Unsubscribe("topic")
 ```
 
