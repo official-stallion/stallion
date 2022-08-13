@@ -47,6 +47,7 @@ func main() {
 ```
 
 ### Server
+In golang server build:
 ```go
 package main
 
@@ -57,4 +58,10 @@ func main() {
 		panic(err)
 	}
 }
+```
+
+### Docker
+Image name for stallion server:
+```shell
+amirhossein21/stallion:v1.1.1
 ```
