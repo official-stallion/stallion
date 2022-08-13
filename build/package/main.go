@@ -1,8 +1,9 @@
 package main
 
 import (
-	"log"
 	"os"
+
+	"github.com/amirhnajafiz/stallion"
 )
 
 const (
@@ -15,5 +16,7 @@ func main() {
 		port = value
 	}
 
-	log.Println(":" + port)
+	if err := stallion.NewServer(":" + port); err != nil {
+		panic(err)
+	}
 }
