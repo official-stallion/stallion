@@ -20,6 +20,4 @@ WORKDIR /
 
 COPY --from=build /docker-gs /docker-gs
 
-USER nonroot:nonroot
-
 ENTRYPOINT ["/docker-gs"]
