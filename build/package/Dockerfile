@@ -14,7 +14,7 @@ COPY *.go ./
 RUN go build -o /docker-gs
 
 ## Deploy
-FROM gcr.io/distroless/base-debian10
+FROM debian:unstable-slim
 
 WORKDIR /
 
