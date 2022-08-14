@@ -1,0 +1,8 @@
+version: "3.9"
+services:
+  stallion-server:
+    image: amirhossein21/stallion:v1.1.1
+    ports:
+      - "7025:7025"
+    environment:
+      SERVER_PORT: 7025
