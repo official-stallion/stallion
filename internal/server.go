@@ -2,8 +2,6 @@ package internal
 
 import (
 	"net"
-
-	"go.uber.org/zap"
 )
 
 // server is our broker service.
@@ -42,7 +40,7 @@ func (s *server) Handle(conn net.Conn) {
 		s.broker.terminateChannel,
 	)
 
-	zap.L().Info("new client", zap.Int("id", s.prefix))
+	logInfo("new client joined")
 
 	s.prefix++
 

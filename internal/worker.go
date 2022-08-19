@@ -3,8 +3,6 @@ package internal
 import (
 	"net"
 	"time"
-
-	"go.uber.org/zap"
 )
 
 // worker handles a single client that wants
@@ -74,7 +72,7 @@ func (w *worker) start() {
 func (w *worker) transfer(data message) {
 	err := w.network.send(encodeMessage(data))
 	if err != nil {
-		zap.L().Error("failed to send", zap.Error(err))
+		logError("failed to send data", err)
 	}
 
 	time.Sleep(1 * time.Millisecond)
@@ -87,14 +85,14 @@ func (w *worker) arrival() {
 	for {
 		tmp, err := w.network.get(buffer)
 		if err != nil {
-			zap.L().Error("failed to read data", zap.Error(err))
+			logError("failed to read data", err)
 
 			break
 		}
 
 		m, er := decodeMessage(tmp)
 		if er != nil {
-			zap.L().Error("parse error", zap.Error(er))
+			logError("parse error", er)
 
 			continue
 		}

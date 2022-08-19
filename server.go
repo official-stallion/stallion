@@ -5,7 +5,6 @@ import (
 	"net"
 
 	"github.com/amirhnajafiz/stallion/internal"
-	"go.uber.org/zap"
 )
 
 type Server interface {
@@ -24,14 +23,10 @@ func NewServer(port string) error {
 		return fmt.Errorf("failed to start server: %v", err)
 	}
 
-	zap.L().Info("start broker server", zap.String("port", port))
-
 	// handling our clients
 	for {
 		if conn, er := listener.Accept(); er == nil {
 			serve.Handle(conn)
-		} else {
-			zap.L().Error("error in client accept", zap.Error(er))
 		}
 	}
 }

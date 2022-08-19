@@ -1,9 +1,5 @@
 package internal
 
-import (
-	"go.uber.org/zap"
-)
-
 // broker handles the message sending and receiving.
 type broker struct {
 	// list of broker workers
@@ -40,7 +36,7 @@ func newBroker(
 
 // start will start our broker logic.
 func (b *broker) start() {
-	zap.L().Info("broker server start")
+	logInfo("broker server start")
 
 	// start a process to listen to our workers
 	go b.listenToWorkers()
@@ -94,7 +90,7 @@ func (b *broker) removeDeadWorker(id int) {
 	for key := range b.workers {
 		b.unsubscribe(key, id)
 
-		zap.L().Info("worker removed", zap.Int("id", id))
+		logInfo("worker removed")
 	}
 }
 
@@ -103,6 +99,6 @@ func (b *broker) publish(data message) {
 	for _, w := range b.workers[data.Topic] {
 		w.channel <- data
 
-		zap.L().Info("message published")
+		logInfo("message published")
 	}
 }

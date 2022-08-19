@@ -3,8 +3,6 @@ package internal
 import (
 	"net"
 	"time"
-
-	"go.uber.org/zap"
 )
 
 // we need safety timeout, to prevent send more than
@@ -57,7 +55,7 @@ func (c *client) readDataFromServer() {
 		// read data from network
 		tmp, er := c.network.get(buffer)
 		if er != nil {
-			zap.L().Error("failed read data", zap.Error(er))
+			logError("failed read data", er)
 
 			break
 		}
@@ -68,7 +66,7 @@ func (c *client) readDataFromServer() {
 				c.communicateChannel <- *m
 			}
 		} else {
-			zap.L().Error("failed in message parse", zap.Error(err))
+			logError("failed in message parse", err)
 		}
 	}
 
@@ -120,7 +118,7 @@ func (c *client) Subscribe(topic string, handler MessageHandler) {
 	// send an http request to broker server
 	err := c.network.send(encodeMessage(newMessage(Subscribe, topic, nil)))
 	if err != nil {
-		zap.L().Fatal("failed send message to broker server", zap.Error(err))
+		logError("failed send message to broker server", err)
 	}
 
 	time.Sleep(safetyTimeout * time.Millisecond)

@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"io"
 	"net"
-
-	"go.uber.org/zap"
 )
 
 // network handles the tcp requests.
@@ -27,7 +25,7 @@ func (n *network) get(buffer []byte) ([]byte, error) {
 	bytes, err := n.connection.Read(buffer)
 	if err != nil {
 		if err != io.EOF {
-			zap.L().Error("network read error", zap.Error(err))
+			logError("network read error", err)
 		}
 
 		return nil, err
