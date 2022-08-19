@@ -1,9 +1,10 @@
 package internal
 
 import (
-	"log"
 	"net"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 // worker handles a single client that wants
@@ -73,7 +74,7 @@ func (w *worker) start() {
 func (w *worker) transfer(data message) {
 	err := w.network.send(encodeMessage(data))
 	if err != nil {
-		log.Printf("failed to send: %v\n", err)
+		zap.L().Error("failed to send", zap.Error(err))
 	}
 
 	time.Sleep(1 * time.Millisecond)
@@ -86,12 +87,14 @@ func (w *worker) arrival() {
 	for {
 		tmp, err := w.network.get(buffer)
 		if err != nil {
+			zap.L().Error("failed to read data", zap.Error(err))
+
 			break
 		}
 
 		m, er := decodeMessage(tmp)
 		if er != nil {
-			log.Printf("parse error: %v", er)
+			zap.L().Error("parse error", zap.Error(er))
 
 			continue
 		}

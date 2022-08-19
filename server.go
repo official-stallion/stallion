@@ -2,10 +2,10 @@ package stallion
 
 import (
 	"fmt"
-	"log"
 	"net"
 
 	"github.com/amirhnajafiz/stallion/internal"
+	"go.uber.org/zap"
 )
 
 type Server interface {
@@ -24,14 +24,14 @@ func NewServer(port string) error {
 		return fmt.Errorf("failed to start server: %v", err)
 	}
 
-	log.Printf("start broker server on %s ...\n", port)
+	zap.L().Info("start broker server", zap.String("port", port))
 
 	// handling our clients
 	for {
 		if conn, er := listener.Accept(); er == nil {
 			serve.Handle(conn)
 		} else {
-			log.Printf("error in client accept: %v\n", er)
+			zap.L().Error("error in client accept", zap.Error(er))
 		}
 	}
 }
