@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"net"
 )
 
@@ -40,7 +41,7 @@ func (s *server) Handle(conn net.Conn) {
 		s.broker.terminateChannel,
 	)
 
-	logInfo("new client joined")
+	logInfo("new client joined", fmt.Sprintf("id=%d", s.prefix))
 
 	s.prefix++
 

@@ -1,5 +1,7 @@
 package internal
 
+import "fmt"
+
 // broker handles the message sending and receiving.
 type broker struct {
 	// list of broker workers
@@ -90,7 +92,7 @@ func (b *broker) removeDeadWorker(id int) {
 	for key := range b.workers {
 		b.unsubscribe(key, id)
 
-		logInfo("worker removed")
+		logInfo("worker removed", fmt.Sprintf("id=%d", id))
 	}
 }
 
@@ -99,6 +101,6 @@ func (b *broker) publish(data message) {
 	for _, w := range b.workers[data.Topic] {
 		w.channel <- data
 
-		logInfo("message published")
+		logInfo("message published", fmt.Sprintf("size=%d", len(data.Data)))
 	}
 }
