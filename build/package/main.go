@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/amirhnajafiz/stallion"
+	"github.com/official-stallion/stallion"
 )
 
 const (
