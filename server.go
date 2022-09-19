@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/amirhnajafiz/stallion/internal"
+	"github.com/official-stallion/stallion/internal"
 )
 
 type Server interface {
