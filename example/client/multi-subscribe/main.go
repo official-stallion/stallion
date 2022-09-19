@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/amirhnajafiz/stallion"
+	"github.com/official-stallion/stallion"
 )
 
 func main() {
