@@ -4,7 +4,7 @@
 
 <p align="center">
 <img src="https://img.shields.io/badge/Golang-1.18-66ADD8?style=for-the-badge&logo=go" alt="go version" />
-<img src="https://img.shields.io/badge/Version-1.1.2-red?style=for-the-badge&logo=none" alt="version" /><br />
+<img src="https://img.shields.io/badge/Version-1.1.2-red?style=for-the-badge&logo=github" alt="version" /><br />
 <img src="https://img.shields.io/badge/MacOS-black?style=for-the-badge&logo=apple" alt="version" />
 <img src="https://img.shields.io/badge/Linux-white?style=for-the-badge&logo=linux" alt="version" />
 <img src="https://img.shields.io/badge/Windows-blue?style=for-the-badge&logo=windows" alt="version" />
@@ -16,7 +16,7 @@ Using no external libraries, just internal Golang libraries.
 ## How to use?
 Get package:
 ```shell
-go get github.com/amirhnajafiz/stallion@latest
+go get github.com/official-stallion/stallion@latest
 ```
 
 Now to set the client up you need to create a **stallion** server.<br />
@@ -26,7 +26,7 @@ Stallion server is the message broker server.
 ```go
 package main
 
-import "github.com/amirhnajafiz/stallion"
+import "github.com/official-stallion/stallion"
 
 func main() {
 	if err := stallion.NewServer(":9090"); err != nil {
@@ -47,7 +47,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/amirhnajafiz/stallion"
+	"github.com/official-stallion/stallion"
 )
 
 func main() {
