@@ -27,7 +27,7 @@ func NewClient(uri string) (Client, error) {
 		return nil, fmt.Errorf("invalid uri: %w", err)
 	}
 
-	conn, err := net.Dial("tcp", url.host+":"+url.port)
+	conn, err := net.Dial("tcp", url.address)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to server: %w", err)
 	}

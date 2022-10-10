@@ -10,8 +10,7 @@ import (
 // - host
 // - port
 type url struct {
-	host string
-	port string
+	address string
 }
 
 // urlUnpack
@@ -29,13 +28,11 @@ func urlUnpack(inputUrl string) (*url, error) {
 	}
 
 	// exporting the host:port pair.
-	hostInformation := strings.Split(protocolSplit[1], ":")
-	if len(hostInformation) < 2 {
+	if len(strings.Split(protocolSplit[1], ":")) < 2 {
 		return nil, fmt.Errorf("server ip or port is not given")
 	}
 
 	return &url{
-		host: hostInformation[0],
-		port: hostInformation[1],
+		address: protocolSplit[1],
 	}, nil
 }
