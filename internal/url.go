@@ -16,8 +16,8 @@ type url struct {
 
 // urlUnpack
 // manages to create url struct from url string.
-func urlUnpack(url string) (*url, error) {
-	protocolSplit := strings.Split(url, "://")
+func urlUnpack(inputUrl string) (*url, error) {
+	protocolSplit := strings.Split(inputUrl, "://")
 	if len(protocolSplit) < 2 {
 		return nil, fmt.Errorf("invalid uri")
 	}
@@ -26,5 +26,13 @@ func urlUnpack(url string) (*url, error) {
 		return nil, fmt.Errorf("not using stallion protocol (st://...)")
 	}
 
-	return nil, nil
+	hostInformation := strings.Split(protocolSplit[1], ":")
+	if len(hostInformation) < 2 {
+		return nil, fmt.Errorf("server ip or port is not given")
+	}
+
+	return &url{
+		host: hostInformation[0],
+		port: hostInformation[1],
+	}, nil
 }
