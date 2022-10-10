@@ -8,14 +8,14 @@ import (
 )
 
 func main() {
-	client, err := stallion.NewClient("localhost:9090")
+	client, err := stallion.NewClient("st://localhost:9090")
 	if err != nil {
 		panic(err)
 	}
 
 	for i := 0; i < 2; i++ {
 		go func(j int) {
-			cli, er := stallion.NewClient("localhost:9090")
+			cli, er := stallion.NewClient("st://localhost:9090")
 			if er != nil {
 				log.Fatal(er)
 			}
