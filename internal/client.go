@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"net"
 	"time"
 )
@@ -100,7 +101,33 @@ func (c *client) close() {
 
 // send a ping message to stallion server.
 func (c *client) ping() error {
-	return nil
+	// creating ping data
+	data := []byte("username:password")
+
+	// sending ping data as a message
+	if err := c.network.send(encodeMessage(newMessage(PingMessage, "", data))); err != nil {
+		return fmt.Errorf("failed to ping server: %w", err)
+	}
+
+	// creating a buffer
+	var buffer = make([]byte, 2048)
+
+	// read data from network
+	tmp, er := c.network.get(buffer)
+	if er != nil {
+		return fmt.Errorf("server failed to pong: %w", er)
+	}
+
+	// check for response
+	response, _ := decodeMessage(tmp)
+	switch response.Type {
+	case PongMessage:
+		return nil
+	case Imposter:
+		return fmt.Errorf("unauthorized user")
+	default:
+		return fmt.Errorf("connection failed")
+	}
 }
 
 // Publish will send a message to broker server.

@@ -21,10 +21,3 @@ type unsubscribeChannel struct {
 	id    int
 	topic string
 }
-
-// pingMessage is the first message that is being sent
-// to stallion server.
-type pingMessage struct {
-	username string
-	password string
-}
