@@ -29,7 +29,7 @@ type client struct {
 }
 
 // NewClient creates a new client handler.
-func NewClient(conn net.Conn) *client {
+func NewClient(conn net.Conn) (*client, error) {
 	c := &client{
 		topics:             make(map[string]MessageHandler),
 		communicateChannel: make(chan message),
@@ -39,13 +39,18 @@ func NewClient(conn net.Conn) *client {
 		},
 	}
 
+	// send the ping message
+	if err := c.ping([]byte("")); err != nil {
+		return nil, fmt.Errorf("failed to create client: %w", err)
+	}
+
 	// starting data reader
 	go c.readDataFromServer()
 
 	// start listening on channels
 	go c.listen()
 
-	return c
+	return c, nil
 }
 
 // readDataFromServer gets all data from server.
