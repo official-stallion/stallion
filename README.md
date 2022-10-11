@@ -4,7 +4,7 @@
 
 <p align="center">
 <img src="https://img.shields.io/badge/Golang-1.19-66ADD8?style=for-the-badge&logo=go" alt="go version" />
-<img src="https://img.shields.io/badge/Version-1.1.3-red?style=for-the-badge&logo=github" alt="version" /><br />
+<img src="https://img.shields.io/badge/Version-1.2.0-red?style=for-the-badge&logo=github" alt="version" /><br />
 <img src="https://img.shields.io/badge/MacOS-black?style=for-the-badge&logo=apple" alt="version" />
 <img src="https://img.shields.io/badge/Linux-white?style=for-the-badge&logo=linux" alt="version" />
 <img src="https://img.shields.io/badge/Windows-blue?style=for-the-badge&logo=windows" alt="version" />
@@ -74,5 +74,27 @@ client.Publish("topic", []byte("Hello"))
 ### Unsubscribe from a topic
 ```go
 client.Unsubscribe("topic")
+```
+
+## Creating a server with Auth
+You can create a Stallion server with username and password for Auth.
+```go
+package main
+
+import "github.com/official-stallion/stallion"
+
+func main() {
+	if err := stallion.NewServer(":9090", "root", "Pa$$word"); err != nil {
+		panic(err)
+	}
+}
+```
+
+Now you can connect with username and password set in url.
+```go
+client, err := stallion.NewClient("st://root:Pa$$word@localhost:9090")
+if err != nil {
+    panic(err)
+}
 ```
 
