@@ -1,7 +1,9 @@
 package internal
 
 import (
+	"fmt"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -10,6 +12,12 @@ import (
 type worker struct {
 	// each worker has its unique id
 	id int
+
+	// authentication fields
+	// user of stallion client
+	user string
+	// pass of stallion client
+	pass string
 
 	// for network socket handling
 	network network
@@ -33,6 +41,8 @@ type worker struct {
 // newWorker generates a new worker.
 func newWorker(
 	id int,
+	user string,
+	pass string,
 	conn net.Conn,
 	sen, rec chan message,
 	sub chan subscribeChannel,
@@ -40,7 +50,9 @@ func newWorker(
 	ter chan int,
 ) *worker {
 	return &worker{
-		id: id,
+		id:   id,
+		user: user,
+		pass: pass,
 		network: network{
 			connection: conn,
 		},
@@ -57,6 +69,15 @@ func (w *worker) start() {
 	// closing channel after we are done
 	defer close(w.sendChannel)
 
+	// check the ping pong connection
+	if err := w.pong(); err != nil {
+		logError("failed to pong client", err)
+
+		w.terminateChannel <- w.id
+
+		return
+	}
+
 	// start for input data
 	go w.arrival()
 
@@ -66,6 +87,43 @@ func (w *worker) start() {
 
 		w.transfer(data)
 	}
+}
+
+// get client ping message.
+func (w *worker) pong() error {
+	// creating a buffer
+	var buffer = make([]byte, 2048)
+
+	// read data from network
+	tmp, er := w.network.get(buffer)
+	if er != nil {
+		return fmt.Errorf("client failed to ping: %w", er)
+	}
+
+	// get user request
+	request, err := decodeMessage(tmp)
+	if err != nil {
+		return fmt.Errorf("decode message failed")
+	}
+
+	data := strings.Split(string(request.Data), ":")
+
+	// check auth
+	if w.user == data[0] && w.pass == data[1] {
+		// send pong response
+		if e := w.network.send(encodeMessage(newMessage(PongMessage, "", nil))); e != nil {
+			return fmt.Errorf("failed to pong client: %w", e)
+		}
+
+		return nil
+	}
+
+	// return sabotage message
+	if e := w.network.send(encodeMessage(newMessage(Imposter, "", nil))); e != nil {
+		return fmt.Errorf("failed to pong client: %w", e)
+	}
+
+	return fmt.Errorf("un-auth client")
 }
 
 // transfer will send a data byte through handler.

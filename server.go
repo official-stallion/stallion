@@ -13,9 +13,24 @@ type Server interface {
 }
 
 // NewServer creates a new broker server on given port.
-func NewServer(port string) error {
+func NewServer(port string, auth ...string) error {
+	// get authentication options
+	var (
+		user string
+		pass string
+	)
+
+	// setting the authentication options
+	if len(auth) > 1 {
+		user = auth[0]
+		pass = auth[1]
+	} else {
+		user = " "
+		pass = " "
+	}
+
 	// creating a new server
-	serve := internal.NewServer()
+	serve := internal.NewServer(user, pass)
 
 	// listen over a port
 	listener, err := net.Listen("tcp", port)

@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"net"
 	"time"
 )
@@ -28,7 +29,7 @@ type client struct {
 }
 
 // NewClient creates a new client handler.
-func NewClient(conn net.Conn) *client {
+func NewClient(conn net.Conn, auth string) (*client, error) {
 	c := &client{
 		topics:             make(map[string]MessageHandler),
 		communicateChannel: make(chan message),
@@ -38,13 +39,18 @@ func NewClient(conn net.Conn) *client {
 		},
 	}
 
+	// send the ping message
+	if err := c.ping([]byte(auth)); err != nil {
+		return nil, fmt.Errorf("failed to create client: %w", err)
+	}
+
 	// starting data reader
 	go c.readDataFromServer()
 
 	// start listening on channels
 	go c.listen()
 
-	return c
+	return c, nil
 }
 
 // readDataFromServer gets all data from server.
@@ -96,6 +102,38 @@ func (c *client) handle(m message) {
 // close will terminate everything.
 func (c *client) close() {
 	_ = c.network.connection.Close()
+}
+
+// send a ping message to stallion server.
+func (c *client) ping(data []byte) error {
+	// sending ping data as a message
+	if err := c.network.send(encodeMessage(newMessage(PingMessage, "", data))); err != nil {
+		return fmt.Errorf("failed to ping server: %w", err)
+	}
+
+	// creating a buffer
+	var buffer = make([]byte, 2048)
+
+	// read data from network
+	tmp, er := c.network.get(buffer)
+	if er != nil {
+		return fmt.Errorf("server failed to pong: %w", er)
+	}
+
+	// check for response
+	response, err := decodeMessage(tmp)
+	if err != nil {
+		return fmt.Errorf("decode message failed")
+	}
+
+	switch response.Type {
+	case PongMessage:
+		return nil
+	case Imposter:
+		return fmt.Errorf("unauthorized user")
+	default:
+		return fmt.Errorf("connection failed")
+	}
 }
 
 // Publish will send a message to broker server.
