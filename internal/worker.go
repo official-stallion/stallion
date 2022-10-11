@@ -69,6 +69,13 @@ func (w *worker) start() {
 	// closing channel after we are done
 	defer close(w.sendChannel)
 
+	// check the ping pong connection
+	if err := w.pong(); err != nil {
+		w.terminateChannel <- w.id
+
+		return
+	}
+
 	// start for input data
 	go w.arrival()
 
