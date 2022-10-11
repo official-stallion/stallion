@@ -100,10 +100,7 @@ func (c *client) close() {
 }
 
 // send a ping message to stallion server.
-func (c *client) ping() error {
-	// creating ping data
-	data := []byte("username:password")
-
+func (c *client) ping(data []byte) error {
 	// sending ping data as a message
 	if err := c.network.send(encodeMessage(newMessage(PingMessage, "", data))); err != nil {
 		return fmt.Errorf("failed to ping server: %w", err)
