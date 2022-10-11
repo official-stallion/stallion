@@ -98,6 +98,11 @@ func (c *client) close() {
 	_ = c.network.connection.Close()
 }
 
+// send a ping message to stallion server.
+func (c *client) ping() error {
+	return nil
+}
+
 // Publish will send a message to broker server.
 func (c *client) Publish(topic string, data []byte) error {
 	err := c.network.send(encodeMessage(newMessage(Text, topic, data)))
