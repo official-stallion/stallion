@@ -29,11 +29,6 @@ func NewServer() *server {
 	return s
 }
 
-// get client ping message.
-func (s *server) pong() error {
-	return nil
-}
-
 // Handle will handle the clients.
 func (s *server) Handle(conn net.Conn) {
 	w := newWorker(

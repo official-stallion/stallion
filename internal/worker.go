@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"net"
 	"time"
 )
@@ -66,6 +67,30 @@ func (w *worker) start() {
 
 		w.transfer(data)
 	}
+}
+
+// get client ping message.
+func (w *worker) pong() error {
+	// creating a buffer
+	var buffer = make([]byte, 2048)
+
+	// read data from network
+	tmp, er := w.network.get(buffer)
+	if er != nil {
+		return fmt.Errorf("client failed to ping: %w", er)
+	}
+
+	// get user request
+	_, _ = decodeMessage(tmp)
+
+	// todo: check username and password
+
+	// send pong response
+	if err := w.network.send(encodeMessage(newMessage(PongMessage, "", nil))); err != nil {
+		return fmt.Errorf("failed to pong client: %w", err)
+	}
+
+	return nil
 }
 
 // transfer will send a data byte through handler.
