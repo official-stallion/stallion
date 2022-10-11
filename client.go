@@ -32,7 +32,10 @@ func NewClient(uri string) (Client, error) {
 		return nil, fmt.Errorf("failed to connect to server: %w", err)
 	}
 
-	client := internal.NewClient(conn)
+	client, err := internal.NewClient(conn, url.auth)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to server: %w", err)
+	}
 
 	return client, nil
 }

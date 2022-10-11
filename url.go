@@ -11,6 +11,7 @@ import (
 // - port
 type url struct {
 	address string
+	auth    string
 }
 
 // urlUnpack
