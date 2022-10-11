@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -11,6 +12,12 @@ import (
 type worker struct {
 	// each worker has its unique id
 	id int
+
+	// authentication fields
+	// user of stallion client
+	user string
+	// pass of stallion client
+	pass string
 
 	// for network socket handling
 	network network
@@ -34,6 +41,8 @@ type worker struct {
 // newWorker generates a new worker.
 func newWorker(
 	id int,
+	user string,
+	pass string,
 	conn net.Conn,
 	sen, rec chan message,
 	sub chan subscribeChannel,
@@ -41,7 +50,9 @@ func newWorker(
 	ter chan int,
 ) *worker {
 	return &worker{
-		id: id,
+		id:   id,
+		user: user,
+		pass: pass,
 		network: network{
 			connection: conn,
 		},
@@ -81,12 +92,19 @@ func (w *worker) pong() error {
 	}
 
 	// get user request
-	_, _ = decodeMessage(tmp)
+	request, _ := decodeMessage(tmp)
+	data := strings.Split(string(request.Data), ":")
 
-	// todo: check username and password
+	// check auth
+	if w.user == data[0] && w.pass == data[1] {
+		// send pong response
+		if err := w.network.send(encodeMessage(newMessage(PongMessage, "", nil))); err != nil {
+			return fmt.Errorf("failed to pong client: %w", err)
+		}
+	}
 
-	// send pong response
-	if err := w.network.send(encodeMessage(newMessage(PongMessage, "", nil))); err != nil {
+	// return sabotage message
+	if err := w.network.send(encodeMessage(newMessage(Imposter, "", nil))); err != nil {
 		return fmt.Errorf("failed to pong client: %w", err)
 	}
 
