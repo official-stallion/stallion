@@ -33,6 +33,8 @@ func NewServer() *server {
 func (s *server) Handle(conn net.Conn) {
 	w := newWorker(
 		s.prefix,
+		"",
+		"",
 		conn,
 		make(chan message),
 		s.broker.receiveChannel,
