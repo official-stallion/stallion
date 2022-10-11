@@ -121,7 +121,11 @@ func (c *client) ping(data []byte) error {
 	}
 
 	// check for response
-	response, _ := decodeMessage(tmp)
+	response, err := decodeMessage(tmp)
+	if err != nil {
+		return fmt.Errorf("decode message failed")
+	}
+
 	switch response.Type {
 	case PongMessage:
 		return nil

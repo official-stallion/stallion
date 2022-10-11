@@ -71,6 +71,8 @@ func (w *worker) start() {
 
 	// check the ping pong connection
 	if err := w.pong(); err != nil {
+		logError("failed to pong client", err)
+
 		w.terminateChannel <- w.id
 
 		return
@@ -99,23 +101,29 @@ func (w *worker) pong() error {
 	}
 
 	// get user request
-	request, _ := decodeMessage(tmp)
+	request, err := decodeMessage(tmp)
+	if err != nil {
+		return fmt.Errorf("decode message failed")
+	}
+
 	data := strings.Split(string(request.Data), ":")
 
 	// check auth
 	if w.user == data[0] && w.pass == data[1] {
 		// send pong response
-		if err := w.network.send(encodeMessage(newMessage(PongMessage, "", nil))); err != nil {
-			return fmt.Errorf("failed to pong client: %w", err)
+		if e := w.network.send(encodeMessage(newMessage(PongMessage, "", nil))); e != nil {
+			return fmt.Errorf("failed to pong client: %w", e)
 		}
+
+		return nil
 	}
 
 	// return sabotage message
-	if err := w.network.send(encodeMessage(newMessage(Imposter, "", nil))); err != nil {
-		return fmt.Errorf("failed to pong client: %w", err)
+	if e := w.network.send(encodeMessage(newMessage(Imposter, "", nil))); e != nil {
+		return fmt.Errorf("failed to pong client: %w", e)
 	}
 
-	return nil
+	return fmt.Errorf("un-auth client")
 }
 
 // transfer will send a data byte through handler.
