@@ -24,6 +24,9 @@ func NewServer(port string, auth ...string) error {
 	if len(auth) > 1 {
 		user = auth[0]
 		pass = auth[1]
+	} else {
+		user = " "
+		pass = " "
 	}
 
 	// creating a new server
