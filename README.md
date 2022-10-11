@@ -13,6 +13,16 @@
 Fast message broker implemented with Golang programming language.<br />
 Using no external libraries, just internal Golang libraries.
 
+## Guide
+- [Install Stallion](#how-to-use)
+- [Setup Stallion Server](#create-server-in-golang)
+- [Using Docker](#create-a-server-with-docker)
+- [Stallion Go SDK](#creating-clients)
+  - [Subscribe](#subscribe-on-a-topic)
+  - [Publish](#publish-over-a-topic)
+  - [Unsubscribe](#unsubscribe-from-a-topic)
+- [Auth](#creating-a-server-with-auth)
+
 ## How to use?
 Get package:
 ```shell
