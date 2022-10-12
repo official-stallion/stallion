@@ -9,11 +9,16 @@ import (
 func TestServer(t *testing.T) {
 	go func() {
 		if err := stallion.NewServer(":6000"); err != nil {
-			t.Errorf("server failed to start: %w", err)
+			t.Errorf("server failed to start: %v", err)
 		}
 	}()
 
 	c, err := stallion.NewClient("localhost:6000")
+	if err == nil {
+		t.Error(err)
+	}
+
+	c, err = stallion.NewClient("st://localhost:6000")
 	if err != nil {
 		t.Error(err)
 	}
