@@ -32,3 +32,30 @@ func TestServer(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestAuthServer(t *testing.T) {
+	go func() {
+		if err := stallion.NewServer(":6001", "root", "password"); err != nil {
+			t.Errorf("server failed to start: %v", err)
+		}
+	}()
+
+	c, err := stallion.NewClient("st://r:pass@localhost:6001")
+	if err == nil {
+		t.Error(err)
+	}
+
+	c, err = stallion.NewClient("st://root:password@localhost:6001")
+	if err != nil {
+		t.Error(err)
+	}
+
+	c.Subscribe("topic", func(bytes []byte) {
+		t.Log("success subscribe")
+	})
+
+	err = c.Publish("topic", []byte("message"))
+	if err != nil {
+		t.Error(err)
+	}
+}
