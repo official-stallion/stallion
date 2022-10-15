@@ -3,7 +3,6 @@ package internal
 import (
 	"fmt"
 	"net"
-	"strings"
 	"time"
 )
 
@@ -13,11 +12,8 @@ type worker struct {
 	// each worker has its unique id
 	id int
 
-	// authentication fields
-	// user of stallion client
-	user string
-	// pass of stallion client
-	pass string
+	// authentication struct
+	auth auth
 
 	// for network socket handling
 	network network
@@ -41,8 +37,7 @@ type worker struct {
 // newWorker generates a new worker.
 func newWorker(
 	id int,
-	user string,
-	pass string,
+	auth auth,
 	conn net.Conn,
 	sen, rec chan message,
 	sub chan subscribeChannel,
@@ -51,8 +46,7 @@ func newWorker(
 ) *worker {
 	return &worker{
 		id:   id,
-		user: user,
-		pass: pass,
+		auth: auth,
 		network: network{
 			connection: conn,
 		},
@@ -106,10 +100,8 @@ func (w *worker) pong() error {
 		return fmt.Errorf("decode message failed")
 	}
 
-	data := strings.Split(string(request.Data), ":")
-
 	// check auth
-	if w.user == data[0] && w.pass == data[1] {
+	if w.auth.authenticate(string(request.Data)) {
 		// send pong response
 		if e := w.network.send(encodeMessage(newMessage(PongMessage, "", nil))); e != nil {
 			return fmt.Errorf("failed to pong client: %w", e)
