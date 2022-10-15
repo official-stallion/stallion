@@ -7,8 +7,7 @@ import (
 
 // server is our broker service.
 type server struct {
-	user string
-	pass string
+	auth auth
 
 	prefix int
 	broker *broker
@@ -17,8 +16,10 @@ type server struct {
 // NewServer returns a new broker server.
 func NewServer(user string, pass string) *server {
 	s := &server{
-		user:   user,
-		pass:   pass,
+		auth: auth{
+			username: user,
+			password: pass,
+		},
 		prefix: 101,
 	}
 
@@ -38,8 +39,7 @@ func NewServer(user string, pass string) *server {
 func (s *server) Handle(conn net.Conn) {
 	w := newWorker(
 		s.prefix,
-		s.user,
-		s.pass,
+		s.auth,
 		conn,
 		make(chan message),
 		s.broker.receiveChannel,
