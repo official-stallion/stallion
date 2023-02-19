@@ -3,6 +3,7 @@ package test
 import (
 	"testing"
 
+	sdk "github.com/official-stallion/go-sdk"
 	"github.com/official-stallion/stallion"
 )
 
@@ -17,13 +18,13 @@ func TestServer(t *testing.T) {
 	}()
 
 	// client does not give a valid url, so we should get error
-	c, err := stallion.NewClient("localhost:6000")
+	c, err := sdk.NewClient("localhost:6000")
 	if err == nil {
 		t.Error(err)
 	}
 
 	// client should connect
-	c, err = stallion.NewClient("st://localhost:6000")
+	c, err = sdk.NewClient("st://localhost:6000")
 	if err != nil {
 		t.Error(err)
 	}
@@ -50,14 +51,14 @@ func TestAuthServer(t *testing.T) {
 		}
 	}()
 
-	// client is not authorized we shoud get error
-	c, err := stallion.NewClient("st://r:pass@localhost:6001")
+	// client is not authorized we should get error
+	c, err := sdk.NewClient("st://r:pass@localhost:6001")
 	if err == nil {
 		t.Error(err)
 	}
 
 	// client should connect
-	c, err = stallion.NewClient("st://root:password@localhost:6001")
+	c, err = sdk.NewClient("st://root:password@localhost:6001")
 	if err != nil {
 		t.Error(err)
 	}

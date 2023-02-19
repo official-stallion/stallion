@@ -2,7 +2,6 @@ package stallion
 
 import (
 	"fmt"
-
 	"github.com/official-stallion/stallion/internal"
 )
 
