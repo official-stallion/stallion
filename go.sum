@@ -1,2 +1,4 @@
 github.com/official-stallion/go-sdk v0.0.0-20230219120730-4b62373eac7b h1:RIgdFz75CPXOGWQYKunxkmUg5FXhtlU2P2QkY4TZ1Ss=
 github.com/official-stallion/go-sdk v0.0.0-20230219120730-4b62373eac7b/go.mod h1:m76X/qZ67EbfNJ1mWP7RSpPly3M5RxI3Jx2L3rKKToo=
+github.com/official-stallion/go-sdk v0.1.0 h1:N5Yxgsh8t4VvhndigIv/SX6rennLtIyj4onNTgOOaK0=
+github.com/official-stallion/go-sdk v0.1.0/go.mod h1:m76X/qZ67EbfNJ1mWP7RSpPly3M5RxI3Jx2L3rKKToo=
