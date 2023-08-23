@@ -1,8 +1,11 @@
 package internal
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net"
+	"net/http"
 )
 
 type Server interface {
@@ -30,7 +33,6 @@ func NewServer(user string, pass string) Server {
 			NumberOfPublish: 0,
 			LiveConnections: 0,
 			DeadConnections: 0,
-			Topics:          make([]string, 0),
 		},
 	}
 
@@ -66,4 +68,33 @@ func (s *server) Handle(conn net.Conn) {
 	s.prefix++
 
 	go w.start()
+}
+
+// metricsHandler will export metrics
+func (s *server) metricsHandler(w http.ResponseWriter, _ *http.Request) {
+	e := export{
+		NumberOfPublish: s.metrics.NumberOfPublish,
+		LiveConnections: s.metrics.LiveConnections,
+		DeadConnections: s.metrics.DeadConnections,
+		Topics:          s.broker.getTopics(),
+	}
+
+	js, err := json.Marshal(e)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_, _ = w.Write(js)
+}
+
+// serveMetrics http server
+func (s *server) serveMetrics(port int) {
+	http.HandleFunc("/metrics", s.metricsHandler)
+
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
+		log.Println(fmt.Errorf("failed to start metrics server error=%w", err))
+	}
 }
