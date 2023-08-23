@@ -12,7 +12,7 @@ import (
 func TestServer(t *testing.T) {
 	// creating a server on port 6000
 	go func() {
-		if err := stallion.NewServer(":6000"); err != nil {
+		if err := stallion.NewServer(":6000", 6001); err != nil {
 			t.Errorf("server failed to start: %v", err)
 		}
 	}()
@@ -46,7 +46,7 @@ func TestServer(t *testing.T) {
 func TestAuthServer(t *testing.T) {
 	// creating a stallion server on port 6001 with user and pass
 	go func() {
-		if err := stallion.NewServer(":6001", "root", "password"); err != nil {
+		if err := stallion.NewServer(":6002", 6003, "root", "password"); err != nil {
 			t.Errorf("server failed to start: %v", err)
 		}
 	}()
