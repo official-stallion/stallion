@@ -5,16 +5,21 @@ import (
 	"net"
 )
 
+type Server interface {
+	Handle(conn net.Conn)
+}
+
 // server is our broker service.
 type server struct {
-	auth auth
+	auth    auth
+	metrics *Metrics
 
 	prefix int
 	broker *broker
 }
 
 // NewServer returns a new broker server.
-func NewServer(user string, pass string) *server {
+func NewServer(user string, pass string) Server {
 	s := &server{
 		auth: auth{
 			username: user,
@@ -50,6 +55,7 @@ func (s *server) Handle(conn net.Conn) {
 
 	logInfo("new client joined", fmt.Sprintf("id=%d", s.prefix))
 
+	s.metrics.LiveConnections++
 	s.prefix++
 
 	go w.start()
