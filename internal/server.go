@@ -26,6 +26,11 @@ func NewServer(user string, pass string) Server {
 			password: pass,
 		},
 		prefix: 101,
+		metrics: &Metrics{
+			LiveConnections: 0,
+			DeadConnections: 0,
+			Topics:          make([]string, 0),
+		},
 	}
 
 	// setting up the server broker and starting it
@@ -34,6 +39,7 @@ func NewServer(user string, pass string) Server {
 		make(chan subscribeChannel),
 		make(chan unsubscribeChannel),
 		make(chan int),
+		s.metrics,
 	)
 	go s.broker.start()
 

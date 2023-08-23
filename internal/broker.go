@@ -7,6 +7,9 @@ type broker struct {
 	// list of broker workers
 	workers map[string][]workerChannel
 
+	// metrics instance
+	metrics *Metrics
+
 	// receiveChannel is a public channel between workers and broker
 	receiveChannel chan message
 
@@ -26,6 +29,7 @@ func newBroker(
 	subscribe chan subscribeChannel,
 	unsubscribe chan unsubscribeChannel,
 	termination chan int,
+	metrics *Metrics,
 ) *broker {
 	return &broker{
 		workers:            make(map[string][]workerChannel),
@@ -33,6 +37,7 @@ func newBroker(
 		subscribeChannel:   subscribe,
 		unsubscribeChannel: unsubscribe,
 		terminateChannel:   termination,
+		metrics:            metrics,
 	}
 }
 
@@ -94,6 +99,8 @@ func (b *broker) removeDeadWorker(id int) {
 
 		logInfo("worker removed", fmt.Sprintf("id=%d", id))
 	}
+
+	b.metrics.DeadConnections++
 }
 
 // publish will send a data over channels.
