@@ -1,6 +1,8 @@
 package internal
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // broker handles the message sending and receiving.
 type broker struct {
@@ -110,4 +112,17 @@ func (b *broker) publish(data message) {
 
 		logInfo("message published", fmt.Sprintf("size=%d", len(data.Data)))
 	}
+
+	b.metrics.NumberOfPublish++
+}
+
+// get current topics of cluster
+func (b *broker) getTopics() []string {
+	list := make([]string, 0)
+
+	for key := range b.workers {
+		list = append(list, key)
+	}
+
+	return list
 }

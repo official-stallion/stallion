@@ -27,6 +27,7 @@ func NewServer(user string, pass string) Server {
 		},
 		prefix: 101,
 		metrics: &Metrics{
+			NumberOfPublish: 0,
 			LiveConnections: 0,
 			DeadConnections: 0,
 			Topics:          make([]string, 0),
