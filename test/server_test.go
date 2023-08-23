@@ -44,7 +44,7 @@ func TestServer(t *testing.T) {
 // TestAuthServer
 // testing stallion server with auth.
 func TestAuthServer(t *testing.T) {
-	// creating a stallion server on port 6001 with user and pass
+	// creating a stallion server on port 6002 with user and pass
 	go func() {
 		if err := stallion.NewServer(":6002", 6003, "root", "password"); err != nil {
 			t.Errorf("server failed to start: %v", err)

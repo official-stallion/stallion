@@ -93,11 +93,13 @@ func (s *server) metricsHandler(w http.ResponseWriter, _ *http.Request) {
 
 // serveMetrics http server
 func (s *server) serveMetrics(port int) {
-	http.HandleFunc("/metrics", s.metricsHandler)
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/metrics", s.metricsHandler)
 
 	log.Println(fmt.Sprintf("metrics server started on %d ...", port))
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), mux); err != nil {
 		log.Println(fmt.Errorf("failed to start metrics server error=%w", err))
 	}
 }
