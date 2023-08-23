@@ -22,7 +22,7 @@ type server struct {
 }
 
 // NewServer returns a new broker server.
-func NewServer(user string, pass string) Server {
+func NewServer(metrics int, user string, pass string) Server {
 	s := &server{
 		auth: auth{
 			username: user,
@@ -45,6 +45,7 @@ func NewServer(user string, pass string) Server {
 		s.metrics,
 	)
 	go s.broker.start()
+	go s.serveMetrics(metrics)
 
 	return s
 }
@@ -93,6 +94,8 @@ func (s *server) metricsHandler(w http.ResponseWriter, _ *http.Request) {
 // serveMetrics http server
 func (s *server) serveMetrics(port int) {
 	http.HandleFunc("/metrics", s.metricsHandler)
+
+	log.Println(fmt.Sprintf("metrics server started on %d ...", port))
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
 		log.Println(fmt.Errorf("failed to start metrics server error=%w", err))
