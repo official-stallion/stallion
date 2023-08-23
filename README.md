@@ -2,18 +2,25 @@
 <img src=".github/assets/logo.png" alt="logo" />
 </p>
 
+<br />
+
 <p align="center">
-<img src="https://img.shields.io/badge/Golang-1.19-66ADD8?style=for-the-badge&logo=go" alt="go version" />
-<img src="https://img.shields.io/badge/Version-1.3.0-red?style=for-the-badge&logo=github" alt="version" /><br />
-<img src="https://img.shields.io/badge/MacOS-black?style=for-the-badge&logo=apple" alt="version" />
-<img src="https://img.shields.io/badge/Linux-white?style=for-the-badge&logo=linux" alt="version" />
-<img src="https://img.shields.io/badge/Windows-blue?style=for-the-badge&logo=windows" alt="version" />
+	<img src="https://img.shields.io/badge/Golang-1.19-66ADD8?style=for-the-badge&logo=go" alt="go version" />
+	<img src="https://img.shields.io/badge/Version-1.3.0-red?style=for-the-badge&logo=github" alt="version" /><br />
+	<img src="https://img.shields.io/badge/MacOS-black?style=for-the-badge&logo=apple" alt="version" />
+	<img src="https://img.shields.io/badge/Linux-white?style=for-the-badge&logo=linux" alt="version" />
+	<img src="https://img.shields.io/badge/Windows-blue?style=for-the-badge&logo=windows" alt="version" />
 </p>
 
-Fast message broker implemented with Golang programming language.<br />
-Using no external libraries, just internal Golang libraries.
+<br />
+
+A fast message broker implemented with Golang programming language. 
+Stallion is build using no external libraries, just internal Golang libraries.
+You can use Stallion in order to make communication between clients with sending and 
+receiving events.
 
 ## Guide
+
 - [Install Stallion](#how-to-use)
 - [Setup Stallion Server](#create-server-in-golang)
 - [Using Docker](#create-a-server-with-docker)
