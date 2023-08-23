@@ -46,7 +46,7 @@ func main() {
 
 ### Create a server with docker
 
-Check the docker [documentation](./docker/README.md) for stallion server.
+Check the docker [documentation](https://github.com/official-stallion/stable) for stallion server.
 
 ## Creating a server with Auth
 
