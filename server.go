@@ -21,7 +21,7 @@ func NewServer(port string, metrics int, auth ...string) error {
 	)
 
 	// setting the authentication options
-	if len(auth) > 1 {
+	if len(auth) > 1 && auth[0] != "" && auth[1] != "" {
 		user = auth[0]
 		pass = auth[1]
 	} else {
